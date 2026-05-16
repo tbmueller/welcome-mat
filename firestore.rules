@@ -1,0 +1,84 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Membership doc IDs are {tripId}_{uid} — avoids list() calls in helpers
+    function isMember(tripId) {
+      return exists(/databases/$(database)/documents/memberships/$(tripId + '_' + request.auth.uid));
+    }
+
+    function isHost(tripId) {
+      return get(/databases/$(database)/documents/memberships/$(tripId + '_' + request.auth.uid)).data.role == 'host';
+    }
+
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    // ── Users ────────────────────────────────────────────────────────────────
+    match /users/{uid} {
+      allow read, write: if isSignedIn() && request.auth.uid == uid;
+    }
+
+    // ── Saved Addresses ──────────────────────────────────────────────────────
+    match /savedAddresses/{addrId} {
+      allow read, write: if isSignedIn() && resource.data.userUid == request.auth.uid;
+      allow create: if isSignedIn() && request.resource.data.userUid == request.auth.uid;
+    }
+
+    // ── Trips ────────────────────────────────────────────────────────────────
+    match /trips/{tripId} {
+      allow read: if isSignedIn() && isMember(tripId);
+      allow create: if isSignedIn();
+      allow update, delete: if isSignedIn() && isHost(tripId);
+    }
+
+    // ── Memberships ──────────────────────────────────────────────────────────
+    match /memberships/{membershipId} {
+      // Members can read their own; host can read all memberships for their trip
+      allow read: if isSignedIn() &&
+        (resource.data.userUid == request.auth.uid || isHost(resource.data.tripId));
+      allow create: if isSignedIn() && isHost(request.resource.data.tripId);
+      allow delete: if isSignedIn() && isHost(resource.data.tripId);
+    }
+
+    // ── Invites ──────────────────────────────────────────────────────────────
+    match /invites/{inviteId} {
+      // Host can read all invites for their trip
+      allow read: if isSignedIn() && isHost(resource.data.tripId);
+      allow create: if isSignedIn() && isHost(request.resource.data.tripId);
+      // Guest can redeem (set usedByUid) once — cannot change anything else
+      allow update: if isSignedIn() &&
+        resource.data.usedByUid == null &&
+        resource.data.active == true &&
+        request.resource.data.usedByUid == request.auth.uid &&
+        request.resource.data.diff(resource.data).affectedKeys().hasOnly(['usedByUid']);
+      allow delete: if isSignedIn() && isHost(resource.data.tripId);
+    }
+
+    // ── Flights ──────────────────────────────────────────────────────────────
+    match /flights/{flightId} {
+      allow read: if isSignedIn() && isMember(resource.data.tripId);
+      allow create: if isSignedIn() && isMember(request.resource.data.tripId);
+      // Host or a passenger on this flight can update/delete
+      allow update, delete: if isSignedIn() &&
+        (isHost(resource.data.tripId) ||
+         exists(/databases/$(database)/documents/passengers/$(flightId + '_' + request.auth.uid)));
+    }
+
+    // ── Passengers ───────────────────────────────────────────────────────────
+    match /passengers/{passengerId} {
+      allow read: if isSignedIn() && isMember(resource.data.tripId);
+      allow create: if isSignedIn() &&
+        request.resource.data.userUid == request.auth.uid &&
+        isMember(request.resource.data.tripId);
+      allow delete: if isSignedIn() &&
+        (resource.data.userUid == request.auth.uid || isHost(resource.data.tripId));
+    }
+
+    // ── Deny everything else ─────────────────────────────────────────────────
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}
