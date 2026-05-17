@@ -31,20 +31,33 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     const unsub = onAuthStateChanged(auth, async (fbUser) => {
       if (fbUser) {
         setFirebaseUser(fbUser);
-        const ref = doc(db, "users", fbUser.uid);
-        const snap = await getDoc(ref);
-        if (!snap.exists()) {
-          const newUser: User = {
+        try {
+          const ref = doc(db, "users", fbUser.uid);
+          const snap = await getDoc(ref);
+          const stored = snap.data();
+          if (!snap.exists() || !stored?.uid) {
+            // Doc missing or incomplete (e.g. created by a server merge with only defaultAddressId)
+            const newUser: User = {
+              uid: fbUser.uid,
+              email: fbUser.email!,
+              displayName: fbUser.displayName ?? "Guest",
+              photoURL: fbUser.photoURL,
+              defaultAddressId: stored?.defaultAddressId ?? null,
+            };
+            await setDoc(ref, { ...newUser, createdAt: serverTimestamp() }, { merge: true });
+            setUser(newUser);
+          } else {
+            setUser(stored as User);
+          }
+        } catch {
+          // Firestore unavailable — build user from Auth data
+          setUser({
             uid: fbUser.uid,
             email: fbUser.email!,
             displayName: fbUser.displayName ?? "Guest",
             photoURL: fbUser.photoURL,
             defaultAddressId: null,
-          };
-          await setDoc(ref, { ...newUser, createdAt: serverTimestamp() });
-          setUser(newUser);
-        } else {
-          setUser(snap.data() as User);
+          });
         }
       } else {
         setFirebaseUser(null);
