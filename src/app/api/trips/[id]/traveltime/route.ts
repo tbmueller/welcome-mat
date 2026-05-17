@@ -22,8 +22,15 @@ export async function GET(
   if (!tripSnap.exists) return NextResponse.json({ error: "Not found" }, { status: 404 });
 
   const trip = tripSnap.data()!;
-  const baseLatLng: { lat: number; lng: number } = trip.baseLatLng;
-  const baseAddress: string = trip.baseAddress;
+
+  const url = new URL(req.url);
+  const fromLat = parseFloat(url.searchParams.get("fromLat") ?? "");
+  const fromLng = parseFloat(url.searchParams.get("fromLng") ?? "");
+  const fromAddress = url.searchParams.get("fromAddress");
+
+  const baseLatLng: { lat: number; lng: number } =
+    !isNaN(fromLat) && !isNaN(fromLng) ? { lat: fromLat, lng: fromLng } : trip.baseLatLng;
+  const baseAddress: string = fromAddress ?? trip.baseAddress;
 
   // Fetch all active flights for this trip
   const flightsSnap = await adminDb
