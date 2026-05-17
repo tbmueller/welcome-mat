@@ -3,6 +3,8 @@
 import { useEffect, useState } from "react";
 import { api } from "@/lib/apiClient";
 import type { SavedAddress } from "@/types";
+import { AddressAutocomplete } from "@/components/AddressAutocomplete";
+import { IataAutocomplete } from "@/components/IataAutocomplete";
 
 interface Props {
   onClose: () => void;
@@ -64,13 +66,15 @@ export function CreateTripModal({ onClose, onCreated }: Props) {
     }
   }
 
+  const inputCls = "w-full rounded-lg border border-taupe-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-rose-700 dark:border-taupe-600 dark:bg-taupe-700 dark:text-taupe-100 dark:placeholder-taupe-400";
+
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 px-4">
-      <div className="w-full max-w-sm rounded-2xl bg-white p-6 shadow-xl">
+      <div className="w-full max-w-sm rounded-2xl bg-white p-6 shadow-xl dark:bg-taupe-800">
         <h2 className="mb-4 text-lg font-semibold">New trip</h2>
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
-            <label className="mb-1 block text-sm font-medium text-gray-700">
+            <label className="mb-1 block text-sm font-medium text-taupe-700 dark:text-taupe-300">
               Trip name
             </label>
             <input
@@ -78,28 +82,25 @@ export function CreateTripModal({ onClose, onCreated }: Props) {
               value={name}
               onChange={(e) => setName(e.target.value)}
               placeholder="e.g. Summer visit"
-              className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className={inputCls}
               required
             />
           </div>
 
           <div>
-            <label className="mb-1 block text-sm font-medium text-gray-700">
+            <label className="mb-1 block text-sm font-medium text-taupe-700 dark:text-taupe-300">
               Airport (IATA code)
             </label>
-            <input
-              type="text"
+            <IataAutocomplete
               value={airport}
-              onChange={(e) => setAirport(e.target.value.toUpperCase())}
-              placeholder="e.g. SFO"
-              maxLength={3}
-              className="w-full rounded-lg border border-gray-300 px-3 py-2 font-mono text-sm uppercase focus:outline-none focus:ring-2 focus:ring-blue-500"
+              onChange={setAirport}
+              className={`${inputCls} font-mono uppercase`}
               required
             />
           </div>
 
           <div>
-            <label className="mb-1 block text-sm font-medium text-gray-700">
+            <label className="mb-1 block text-sm font-medium text-taupe-700 dark:text-taupe-300">
               Trip base
             </label>
 
@@ -107,7 +108,7 @@ export function CreateTripModal({ onClose, onCreated }: Props) {
               <select
                 value={selectedAddressId}
                 onChange={(e) => handleAddressSelect(e.target.value)}
-                className="mb-2 w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className={`mb-2 ${inputCls}`}
               >
                 {savedAddresses.map((a) => (
                   <option key={a.id} value={a.id}>
@@ -120,16 +121,16 @@ export function CreateTripModal({ onClose, onCreated }: Props) {
 
             {selectedAddressId === "new" && (
               <>
-                <input
-                  type="text"
+                <AddressAutocomplete
                   value={baseAddress}
-                  onChange={(e) => setBaseAddress(e.target.value)}
+                  onChange={setBaseAddress}
+                  onSelect={setBaseAddress}
                   placeholder="Full address"
-                  className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
                   required
+                  className={inputCls}
                 />
 
-                <label className="mt-2 flex items-center gap-2 text-sm text-gray-600">
+                <label className="mt-2 flex items-center gap-2 text-sm text-taupe-600 dark:text-taupe-300">
                   <input
                     type="checkbox"
                     checked={saveAddress}
@@ -146,10 +147,10 @@ export function CreateTripModal({ onClose, onCreated }: Props) {
                       value={saveLabel}
                       onChange={(e) => setSaveLabel(e.target.value)}
                       placeholder="Label (e.g. Home, Airbnb SF)"
-                      className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      className={inputCls}
                       required
                     />
-                    <label className="flex items-center gap-2 text-sm text-gray-600">
+                    <label className="flex items-center gap-2 text-sm text-taupe-600 dark:text-taupe-300">
                       <input
                         type="checkbox"
                         checked={makeDefault}
@@ -164,20 +165,20 @@ export function CreateTripModal({ onClose, onCreated }: Props) {
             )}
           </div>
 
-          {error && <p className="text-sm text-red-500">{error}</p>}
+          {error && <p className="text-sm text-red-500 dark:text-red-400">{error}</p>}
 
           <div className="flex gap-2 pt-1">
             <button
               type="button"
               onClick={onClose}
-              className="flex-1 rounded-lg border border-gray-300 py-2 text-sm font-medium text-gray-600 transition hover:bg-gray-50"
+              className="flex-1 rounded-lg border border-taupe-300 py-2 text-sm font-medium text-taupe-600 transition hover:bg-taupe-50 dark:border-taupe-600 dark:text-taupe-300 dark:hover:bg-taupe-700"
             >
               Cancel
             </button>
             <button
               type="submit"
               disabled={loading}
-              className="flex-1 rounded-lg bg-blue-600 py-2 text-sm font-medium text-white transition hover:bg-blue-700 disabled:opacity-50"
+              className="flex-1 rounded-lg bg-rose-800 py-2 text-sm font-medium text-white transition hover:bg-rose-900 disabled:opacity-50"
             >
               {loading ? "Creating…" : "Create"}
             </button>

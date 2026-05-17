@@ -15,7 +15,7 @@ export default function Home() {
   if (loading) {
     return (
       <div className="flex min-h-screen items-center justify-center">
-        <div className="h-8 w-8 animate-spin rounded-full border-4 border-blue-600 border-t-transparent" />
+        <div className="h-8 w-8 animate-spin rounded-full border-4 border-rose-800 border-t-transparent" />
       </div>
     );
   }
@@ -23,14 +23,14 @@ export default function Home() {
   return (
     <div className="flex min-h-screen flex-col items-center justify-center gap-8 px-4">
       <div className="text-center">
-        <h1 className="text-4xl font-bold tracking-tight">Trip Tracker</h1>
-        <p className="mt-3 text-gray-500">
+        <h1 className="text-4xl font-bold tracking-tight">WelcomeMat</h1>
+        <p className="mt-3 text-taupe-500 dark:text-taupe-400">
           Track your guests&apos; flights and know exactly when to leave.
         </p>
       </div>
       <button
         onClick={signIn}
-        className="flex items-center gap-3 rounded-lg border border-gray-300 bg-white px-6 py-3 text-sm font-medium shadow-sm transition hover:bg-gray-50"
+        className="flex items-center gap-3 rounded-lg border border-taupe-300 bg-white px-6 py-3 text-sm font-medium shadow-sm transition hover:bg-taupe-50 dark:border-taupe-600 dark:bg-taupe-800 dark:text-taupe-100 dark:hover:bg-taupe-700"
       >
         <svg viewBox="0 0 48 48" className="h-5 w-5">
           <path fill="#EA4335" d="M24 9.5c3.5 0 6.6 1.2 9.1 3.2l6.8-6.8C35.8 2.5 30.3 0 24 0 14.6 0 6.6 5.6 2.7 13.8l7.9 6.1C12.5 13.4 17.8 9.5 24 9.5z"/>

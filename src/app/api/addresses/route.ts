@@ -58,9 +58,9 @@ export async function POST(req: NextRequest) {
     existingSnap.docs.forEach((d) => batch.update(d.ref, { isDefault: false }));
 
     // Update user defaultAddressId
-    batch.update(adminDb.collection("users").doc(decoded.uid), {
+    batch.set(adminDb.collection("users").doc(decoded.uid), {
       defaultAddressId: ref.id,
-    });
+    }, { merge: true });
   }
 
   await batch.commit();

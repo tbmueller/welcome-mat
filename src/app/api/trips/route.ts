@@ -97,9 +97,9 @@ export async function POST(req: NextRequest) {
         .where("isDefault", "==", true)
         .get();
       existingSnap.docs.forEach((d) => batch.update(d.ref, { isDefault: false }));
-      batch.update(adminDb.collection("users").doc(decoded.uid), {
+      batch.set(adminDb.collection("users").doc(decoded.uid), {
         defaultAddressId: addrRef.id,
-      });
+      }, { merge: true });
     }
   }
 

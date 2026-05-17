@@ -46,9 +46,9 @@ export async function PATCH(
       if (d.id !== id) batch.update(d.ref, { isDefault: false });
     });
     batch.update(ref, { isDefault: true });
-    batch.update(adminDb.collection("users").doc(decoded.uid), {
+    batch.set(adminDb.collection("users").doc(decoded.uid), {
       defaultAddressId: id,
-    });
+    }, { merge: true });
   }
 
   await batch.commit();
@@ -75,9 +75,9 @@ export async function DELETE(
 
   // If this was the default, clear defaultAddressId on the user
   if (snap.data()?.isDefault) {
-    batch.update(adminDb.collection("users").doc(decoded.uid), {
+    batch.set(adminDb.collection("users").doc(decoded.uid), {
       defaultAddressId: null,
-    });
+    }, { merge: true });
   }
 
   await batch.commit();
