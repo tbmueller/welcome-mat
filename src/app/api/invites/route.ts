@@ -20,7 +20,7 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: parsed.error.flatten() }, { status: 400 });
   }
 
-  const { tripId, email } = parsed.data;
+  const { tripId, email, maxUses } = parsed.data;
 
   const limited = await rateLimits.invite(req, decoded.uid);
   if (limited) return limited;
@@ -38,7 +38,9 @@ export async function POST(req: NextRequest) {
     tripId,
     token,
     email: email ?? null,
-    usedByUid: null,
+    maxUses: email ? 1 : (maxUses ?? 1),
+    useCount: 0,
+    usedByUids: [],
     active: true,
     createdAt: FieldValue.serverTimestamp(),
     expiresAt: expiresAt.toISOString(),

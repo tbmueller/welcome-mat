@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { useAuth } from "@/hooks/useAuth";
 import { api } from "@/lib/apiClient";
-import type { Trip } from "@/types";
+import type { Trip, GuestMergedNotification } from "@/types";
 import { CreateTripModal } from "@/components/CreateTripModal";
 
 export default function DashboardPage() {
@@ -14,6 +14,7 @@ export default function DashboardPage() {
   const [trips, setTrips] = useState<Trip[]>([]);
   const [fetching, setFetching] = useState(true);
   const [showCreate, setShowCreate] = useState(false);
+  const [notifications, setNotifications] = useState<GuestMergedNotification[]>([]);
 
   useEffect(() => {
     if (!loading && !user) router.replace("/");
@@ -21,31 +22,64 @@ export default function DashboardPage() {
 
   useEffect(() => {
     if (!user) return;
-    api.get<{ trips: Trip[] }>("/api/trips").then((r) => {
-      setTrips(r.trips);
+    Promise.all([
+      api.get<{ trips: Trip[] }>("/api/trips"),
+      api.get<{ notifications: GuestMergedNotification[] }>("/api/notifications"),
+    ]).then(([tripsRes, notifRes]) => {
+      setTrips(tripsRes.trips);
+      setNotifications(notifRes.notifications ?? []);
       setFetching(false);
     });
   }, [user]);
 
+  function dismissNotification(id: string) {
+    setNotifications((prev) => prev.filter((n) => n.id !== id));
+    api.patch(`/api/notifications/${id}`, {});
+  }
+
   if (loading || fetching) {
     return (
       <div className="flex min-h-screen items-center justify-center">
-        <div className="h-8 w-8 animate-spin rounded-full border-4 border-blue-600 border-t-transparent" />
+        <div className="h-8 w-8 animate-spin rounded-full border-4 border-rose-800 border-t-transparent" />
       </div>
     );
   }
 
   return (
     <div className="mx-auto max-w-2xl px-4 py-10">
+      {notifications.length > 0 && (
+        <ul className="mb-6 space-y-2">
+          {notifications.map((n) => (
+            <li key={n.id} className="flex items-start justify-between gap-3 rounded-xl border border-rose-200 bg-rose-50 px-4 py-3 text-sm dark:border-rose-900 dark:bg-rose-950">
+              <p className="text-rose-900 dark:text-rose-100">
+                <span className="font-semibold">{n.realDisplayName}</span> joined your trip{" "}
+                <Link href={`/trip/${n.tripId}`} className="underline hover:no-underline">
+                  {n.tripName}
+                </Link>{" "}
+                via invite and was matched to the manual guest you added as{" "}
+                <span className="font-semibold">{n.manualDisplayName}</span>. Their flights have been transferred.
+              </p>
+              <button
+                onClick={() => dismissNotification(n.id)}
+                className="mt-0.5 shrink-0 text-rose-600 hover:text-rose-800 dark:text-rose-700 dark:hover:text-rose-400"
+                aria-label="Dismiss"
+              >
+                ✕
+              </button>
+            </li>
+          ))}
+        </ul>
+      )}
+
       <div className="mb-8 flex items-center justify-between">
         <h1 className="text-2xl font-bold">My Trips</h1>
         <div className="flex items-center gap-3">
-          <Link href="/profile" className="text-sm text-gray-500 hover:text-gray-800">
+          <Link href="/profile" className="text-sm text-taupe-500 hover:text-taupe-800 dark:text-taupe-400 dark:hover:text-taupe-200">
             Profile
           </Link>
           <button
             onClick={signOut}
-            className="text-sm text-gray-500 hover:text-gray-800"
+            className="text-sm text-taupe-500 hover:text-taupe-800 dark:text-taupe-400 dark:hover:text-taupe-200"
           >
             Sign out
           </button>
@@ -54,27 +88,27 @@ export default function DashboardPage() {
 
       <button
         onClick={() => setShowCreate(true)}
-        className="mb-6 w-full rounded-lg border-2 border-dashed border-gray-300 py-4 text-sm text-gray-500 transition hover:border-blue-400 hover:text-blue-600"
+        className="mb-6 w-full rounded-lg border-2 border-dashed border-taupe-300 py-4 text-sm text-taupe-500 transition hover:border-rose-600 hover:text-rose-800 dark:border-taupe-600 dark:text-taupe-400 dark:hover:border-rose-700 dark:hover:text-rose-600"
       >
         + New trip
       </button>
 
       {trips.length === 0 ? (
-        <p className="text-center text-sm text-gray-400">No trips yet.</p>
+        <p className="text-center text-sm text-taupe-400 dark:text-taupe-500">No trips yet.</p>
       ) : (
         <ul className="space-y-3">
           {trips.map((trip) => (
             <li key={trip.id}>
               <Link
                 href={`/trip/${trip.id}`}
-                className="block rounded-xl border border-gray-200 bg-white p-4 shadow-sm transition hover:shadow-md"
+                className="block rounded-xl border border-taupe-200 bg-white p-4 shadow-sm transition hover:shadow-md dark:border-taupe-700 dark:bg-taupe-800 dark:hover:border-taupe-600"
               >
                 <div className="flex items-center justify-between">
                   <div>
                     <p className="font-semibold">{trip.name}</p>
-                    <p className="text-sm text-gray-500">{trip.airport}</p>
+                    <p className="text-sm text-taupe-500 dark:text-taupe-400">{trip.airport}</p>
                   </div>
-                  <span className="text-gray-400">›</span>
+                  <span className="text-taupe-400 dark:text-taupe-500">›</span>
                 </div>
               </Link>
             </li>
