@@ -1,0 +1,79 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 112 112" width="112" height="112" shape-rendering="crispEdges">
+  <defs>
+    <pattern id="cb" x="0" y="0" width="8" height="8" patternUnits="userSpaceOnUse">
+      <rect width="4" height="4" fill="#8B2040"/>
+      <rect x="4" y="0" width="4" height="4" fill="#C45C7A"/>
+      <rect x="0" y="4" width="4" height="4" fill="#C45C7A"/>
+      <rect x="4" y="4" width="4" height="4" fill="#8B2040"/>
+    </pattern>
+  </defs>
+
+  <!-- Outer dark border -->
+  <rect x="0"   y="0"   width="112" height="8"  fill="#2D0B1A"/>
+  <rect x="0"   y="104" width="112" height="8"  fill="#2D0B1A"/>
+  <rect x="0"   y="8"   width="8"   height="96" fill="#2D0B1A"/>
+  <rect x="104" y="8"   width="8"   height="96" fill="#2D0B1A"/>
+
+  <!-- Checkerboard inner border -->
+  <rect x="8"  y="8"  width="96" height="8"  fill="url(#cb)"/>
+  <rect x="8"  y="96" width="96" height="8"  fill="url(#cb)"/>
+  <rect x="8"  y="16" width="8"  height="80" fill="url(#cb)"/>
+  <rect x="96" y="16" width="8"  height="80" fill="url(#cb)"/>
+
+  <!-- Maroon separator strip -->
+  <rect x="16" y="16" width="80" height="4"  fill="#8B2040"/>
+  <rect x="16" y="92" width="80" height="4"  fill="#8B2040"/>
+  <rect x="16" y="20" width="4"  height="72" fill="#8B2040"/>
+  <rect x="92" y="20" width="4"  height="72" fill="#8B2040"/>
+
+  <!-- Deep pink field -->
+  <rect x="20" y="20" width="72" height="72" fill="#C86090"/>
+
+  <!-- Corner accent squares -->
+  <rect x="20" y="20" width="8" height="8" fill="#8B2040"/>
+  <rect x="84" y="20" width="8" height="8" fill="#8B2040"/>
+  <rect x="20" y="84" width="8" height="8" fill="#8B2040"/>
+  <rect x="84" y="84" width="8" height="8" fill="#8B2040"/>
+
+  <!-- Outer maroon diamond (taxicab r=8, center 56,56) -->
+  <rect x="56" y="24" width="4"  height="4" fill="#8B2040"/>
+  <rect x="52" y="28" width="12" height="4" fill="#8B2040"/>
+  <rect x="48" y="32" width="20" height="4" fill="#8B2040"/>
+  <rect x="44" y="36" width="28" height="4" fill="#8B2040"/>
+  <rect x="40" y="40" width="36" height="4" fill="#8B2040"/>
+  <rect x="36" y="44" width="44" height="4" fill="#8B2040"/>
+  <rect x="32" y="48" width="52" height="4" fill="#8B2040"/>
+  <rect x="28" y="52" width="60" height="4" fill="#8B2040"/>
+  <rect x="24" y="56" width="68" height="4" fill="#8B2040"/>
+  <rect x="28" y="60" width="60" height="4" fill="#8B2040"/>
+  <rect x="32" y="64" width="52" height="4" fill="#8B2040"/>
+  <rect x="36" y="68" width="44" height="4" fill="#8B2040"/>
+  <rect x="40" y="72" width="36" height="4" fill="#8B2040"/>
+  <rect x="44" y="76" width="28" height="4" fill="#8B2040"/>
+  <rect x="48" y="80" width="20" height="4" fill="#8B2040"/>
+  <rect x="52" y="84" width="12" height="4" fill="#8B2040"/>
+  <rect x="56" y="88" width="4"  height="4" fill="#8B2040"/>
+
+  <!-- Inner lighter pink hollow (taxicab r=6) -->
+  <rect x="56" y="32" width="4"  height="4" fill="#D878A8"/>
+  <rect x="52" y="36" width="12" height="4" fill="#D878A8"/>
+  <rect x="48" y="40" width="20" height="4" fill="#D878A8"/>
+  <rect x="44" y="44" width="28" height="4" fill="#D878A8"/>
+  <rect x="40" y="48" width="36" height="4" fill="#D878A8"/>
+  <rect x="36" y="52" width="44" height="4" fill="#D878A8"/>
+  <rect x="32" y="56" width="52" height="4" fill="#D878A8"/>
+  <rect x="36" y="60" width="44" height="4" fill="#D878A8"/>
+  <rect x="40" y="64" width="36" height="4" fill="#D878A8"/>
+  <rect x="44" y="68" width="28" height="4" fill="#D878A8"/>
+  <rect x="48" y="72" width="20" height="4" fill="#D878A8"/>
+  <rect x="52" y="76" width="12" height="4" fill="#D878A8"/>
+  <rect x="56" y="80" width="4"  height="4" fill="#D878A8"/>
+
+  <!-- Center medallion (taxicab r=1) -->
+  <rect x="56" y="52" width="4"  height="4" fill="#8B2040"/>
+  <rect x="52" y="56" width="12" height="4" fill="#8B2040"/>
+  <rect x="56" y="60" width="4"  height="4" fill="#8B2040"/>
+
+  <!-- Center highlight -->
+  <rect x="56" y="56" width="4" height="4" fill="#FAD8EC"/>
+</svg>
