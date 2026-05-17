@@ -32,6 +32,7 @@ yarn-error.log*
 
 # env files — never commit secrets
 .env*
+!.env.local.example
 
 # Claude Code local settings — may contain API keys from allowed commands
 .claude/settings.local.json

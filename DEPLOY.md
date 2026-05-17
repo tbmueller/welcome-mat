@@ -38,9 +38,10 @@ All should be scoped to **Production** (and Preview if you want preview deploys 
 | `GOOGLE_MAPS_KEY` | Google Cloud Console → APIs & Services → Credentials | **Secret** — restrict to your Vercel domain in production (see step 6) |
 | `RESEND_API_KEY` | resend.com → API Keys | **Secret** |
 | `RESEND_FROM` | e.g. `noreply@yourdomain.com` | Must match a verified Resend sender domain |
-| `UPSTASH_REDIS_REST_URL` | Upstash console → your database | **Secret** |
+| `UPSTASH_REDIS_REST_URL` | Upstash console → your Redis database | **Secret** |
 | `UPSTASH_REDIS_REST_TOKEN` | Same | **Secret** |
-| `CRON_SECRET` | Generate: `openssl rand -base64 32` | **Secret** — used to authenticate Vercel Cron calls |
+| `QSTASH_CURRENT_SIGNING_KEY` | Upstash console → QStash → Signing Keys | **Secret** |
+| `QSTASH_NEXT_SIGNING_KEY` | Same page | **Secret** |
 | `NEXT_PUBLIC_APP_URL` | Your Vercel production URL | e.g. `https://your-app.vercel.app` — update after first deploy |
 
 ---
@@ -98,8 +99,23 @@ This URL is embedded in invite email links and Capacitor Universal Links.
 
 ---
 
+## 9 — Set up QStash cron schedule
+
+After the first successful deploy:
+
+1. Upstash console → QStash → Schedules → Create Schedule
+2. URL: `https://your-app.vercel.app/api/cron/poll-flights`
+3. Method: `POST`
+4. Schedule: `*/5 * * * *` (every 5 minutes)
+5. No body needed
+
+QStash signs every request with `upstash-signature` — the route verifies it using `QSTASH_CURRENT_SIGNING_KEY` / `QSTASH_NEXT_SIGNING_KEY`. No separate cron secret needed.
+
+Free tier allows 500 messages/day; a 5-min cron uses 288/day.
+
+---
+
 ## Ongoing
 
 - Redeploy Firestore rules after any change to `firestore.rules`
-- Rotate `CRON_SECRET` in both Vercel and `vercel.json` if ever exposed
 - Monitor AeroAPI usage — free tier has a monthly call limit

@@ -1,15 +1,25 @@
 import { NextRequest, NextResponse } from "next/server";
+import { Receiver } from "@upstash/qstash";
 import { adminDb } from "@/lib/firebaseAdmin";
 import { fetchFlightStatus } from "@/lib/aeroapi";
 
 const LOCK_DOC = "pollLock";
 const LOCK_TTL_MS = 4 * 60 * 1000; // 4 minutes — cron fires every 5
 
-// GET /api/cron/poll-flights — called by Vercel Cron every 5 minutes
-export async function GET(req: NextRequest) {
-  // Verify the request came from Vercel's cron scheduler
-  const authHeader = req.headers.get("Authorization");
-  if (authHeader !== `Bearer ${process.env.CRON_SECRET}`) {
+// POST /api/cron/poll-flights — triggered by Upstash QStash every 5 minutes
+export async function POST(req: NextRequest) {
+  const receiver = new Receiver({
+    currentSigningKey: process.env.QSTASH_CURRENT_SIGNING_KEY!,
+    nextSigningKey: process.env.QSTASH_NEXT_SIGNING_KEY!,
+  });
+
+  const body = await req.text();
+  const isValid = await receiver.verify({
+    signature: req.headers.get("upstash-signature") ?? "",
+    body,
+  }).catch(() => false);
+
+  if (!isValid) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
