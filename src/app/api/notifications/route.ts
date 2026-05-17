@@ -11,10 +11,11 @@ export async function GET(req: NextRequest) {
     .collection("notifications")
     .where("hostUid", "==", decoded.uid)
     .where("read", "==", false)
-    .orderBy("createdAt", "desc")
     .limit(20)
     .get();
 
-  const notifications = snap.docs.map((d) => ({ id: d.id, ...d.data() }));
+  const notifications = snap.docs
+    .map((d) => ({ id: d.id, ...(d.data() as { createdAt: string }) }))
+    .sort((a, b) => (b.createdAt > a.createdAt ? 1 : -1));
   return NextResponse.json({ notifications });
 }
