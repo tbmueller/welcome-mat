@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
-import { verifyIdToken, assertMembership } from "@/lib/verifyIdToken";
+import { verifyIdToken, assertMembership, assertHost } from "@/lib/verifyIdToken";
 import { adminDb } from "@/lib/firebaseAdmin";
+import { AddManualGuestSchema } from "@/lib/validation";
+import crypto from "crypto";
 
 // GET /api/trips/[id]/members — list memberships (displayName + photoURL only, no emails)
 export async function GET(
@@ -35,8 +37,42 @@ export async function GET(
   return NextResponse.json({ members });
 }
 
-// DELETE /api/trips/[id]/members/[uid] is handled separately —
-// host removes a guest from a trip
+// POST /api/trips/[id]/members — host adds a manual (offline) guest by name
+export async function POST(
+  req: NextRequest,
+  { params }: { params: Promise<{ id: string }> }
+) {
+  const decoded = await verifyIdToken(req);
+  if (!decoded) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+
+  const { id: tripId } = await params;
+
+  if (!(await assertHost(decoded.uid, tripId))) {
+    return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+  }
+
+  const body = await req.json();
+  const parsed = AddManualGuestSchema.safeParse(body);
+  if (!parsed.success) {
+    return NextResponse.json({ error: parsed.error.flatten() }, { status: 400 });
+  }
+
+  const userUid = `manual_${crypto.randomBytes(12).toString("hex")}`;
+  const membershipId = `${tripId}_${userUid}`;
+
+  await adminDb.collection("memberships").doc(membershipId).set({
+    tripId,
+    userUid,
+    role: "guest",
+    displayName: parsed.data.displayName,
+    photoURL: null,
+    isManual: true,
+  });
+
+  return NextResponse.json({ userUid, displayName: parsed.data.displayName });
+}
+
+// DELETE /api/trips/[id]/members — host removes a guest from a trip
 export async function DELETE(
   req: NextRequest,
   { params }: { params: Promise<{ id: string }> }
