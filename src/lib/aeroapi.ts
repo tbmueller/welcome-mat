@@ -33,7 +33,7 @@ function mapStatus(raw: string): FlightStatus {
 export async function fetchFlightStatus(
   flightNumber: string,
   date: string
-): Promise<Partial<Flight>> {
+): Promise<Partial<Flight> | null> {
   const url = new URL(`${AEROAPI_BASE}/flights/${encodeURIComponent(flightNumber)}`);
   // Narrow the search window to ±1 day around the flight date
   const start = new Date(date);
@@ -56,7 +56,7 @@ export async function fetchFlightStatus(
 
   const data = await res.json();
   const flight: AeroApiFlight | undefined = data.flights?.[0];
-  if (!flight) throw new Error("Flight not found");
+  if (!flight) return null;
 
   return {
     airline: flight.operator,

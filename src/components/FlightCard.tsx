@@ -7,17 +7,19 @@ import type { FlightWithPassengers, FlightStatus } from "@/types";
 type ExtendedFlight = FlightWithPassengers & { directionsUrl?: string };
 
 const STATUS_STYLES: Record<FlightStatus, string> = {
-  scheduled: "bg-gray-100 text-gray-600",
-  departed: "bg-blue-100 text-blue-700",
-  en_route: "bg-blue-100 text-blue-700",
-  landed: "bg-green-100 text-green-700",
-  arrived: "bg-green-100 text-green-700",
-  cancelled: "bg-red-100 text-red-700",
-  diverted: "bg-orange-100 text-orange-700",
-  unknown: "bg-gray-100 text-gray-400",
+  pending: "bg-yellow-50 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-400",
+  scheduled: "bg-taupe-100 text-taupe-600 dark:bg-taupe-700 dark:text-taupe-300",
+  departed: "bg-rose-100 text-rose-900 dark:bg-rose-900 dark:text-rose-400",
+  en_route: "bg-rose-100 text-rose-900 dark:bg-rose-900 dark:text-rose-400",
+  landed: "bg-green-100 text-green-700 dark:bg-green-900 dark:text-green-300",
+  arrived: "bg-green-100 text-green-700 dark:bg-green-900 dark:text-green-300",
+  cancelled: "bg-red-100 text-red-700 dark:bg-red-900 dark:text-red-300",
+  diverted: "bg-orange-100 text-orange-700 dark:bg-orange-900 dark:text-orange-300",
+  unknown: "bg-taupe-100 text-taupe-400 dark:bg-taupe-700 dark:text-taupe-500",
 };
 
 const STATUS_LABELS: Record<FlightStatus, string> = {
+  pending: "Pending",
   scheduled: "Scheduled",
   departed: "Departed",
   en_route: "En route",
@@ -62,7 +64,7 @@ export function FlightCard({ flight, isHost, currentUserUid, onRemoved }: Props)
   }
 
   return (
-    <li className="rounded-xl border border-gray-200 bg-white p-4 shadow-sm">
+    <li className="rounded-xl border border-taupe-200 bg-white p-4 shadow-sm dark:border-taupe-700 dark:bg-taupe-800">
       <div className="flex items-start justify-between gap-4">
         <div className="flex-1 min-w-0">
           {/* Flight number + status */}
@@ -74,7 +76,7 @@ export function FlightCard({ flight, isHost, currentUserUid, onRemoved }: Props)
               {STATUS_LABELS[flight.status]}
             </span>
             {isDelayed && (
-              <span className="rounded-full bg-amber-100 px-2 py-0.5 text-xs font-medium text-amber-700">
+              <span className="rounded-full bg-amber-100 px-2 py-0.5 text-xs font-medium text-amber-700 dark:bg-amber-900 dark:text-amber-300">
                 Delayed
               </span>
             )}
@@ -82,21 +84,21 @@ export function FlightCard({ flight, isHost, currentUserUid, onRemoved }: Props)
 
           {/* Airline */}
           {flight.airline && (
-            <p className="mt-0.5 text-xs text-gray-400">{flight.airline}</p>
+            <p className="mt-0.5 text-xs text-taupe-400 dark:text-taupe-500">{flight.airline}</p>
           )}
 
           {/* Time */}
           <div className="mt-2 flex items-center gap-3 text-sm">
             {isDelayed ? (
               <>
-                <span className="line-through text-gray-400">{fmt(scheduledTime)}</span>
-                <span className="font-medium text-amber-700">{fmt(estimatedTime)}</span>
+                <span className="line-through text-taupe-400 dark:text-taupe-500">{fmt(scheduledTime)}</span>
+                <span className="font-medium text-amber-700 dark:text-amber-400">{fmt(estimatedTime)}</span>
               </>
             ) : (
               <span className="font-medium">{fmt(estimatedTime ?? scheduledTime)}</span>
             )}
             {terminal && (
-              <span className="text-gray-400">
+              <span className="text-taupe-400 dark:text-taupe-500">
                 Terminal {terminal}
                 {gate ? `, Gate ${gate}` : ""}
               </span>
@@ -109,7 +111,7 @@ export function FlightCard({ flight, isHost, currentUserUid, onRemoved }: Props)
               {flight.passengers.map((p) => (
                 <span
                   key={p.userUid}
-                  className="rounded-full bg-gray-100 px-2 py-0.5 text-xs text-gray-600"
+                  className="rounded-full bg-taupe-100 px-2 py-0.5 text-xs text-taupe-600 dark:bg-taupe-700 dark:text-taupe-300"
                 >
                   {p.displayName}
                 </span>
@@ -123,12 +125,12 @@ export function FlightCard({ flight, isHost, currentUserUid, onRemoved }: Props)
           <div className="shrink-0 text-right">
             {flight.leaveBy && (
               <div className="mb-1">
-                <p className="text-xs text-gray-400">Leave by</p>
-                <p className="font-semibold text-blue-700">
+                <p className="text-xs text-taupe-400 dark:text-taupe-500">Leave by</p>
+                <p className="font-semibold text-rose-900 dark:text-rose-600">
                   {format(parseISO(flight.leaveBy), "h:mm a")}
                 </p>
                 {flight.travelMinutes && (
-                  <p className="text-xs text-gray-400">{flight.travelMinutes} min drive</p>
+                  <p className="text-xs text-taupe-400 dark:text-taupe-500">{flight.travelMinutes} min drive</p>
                 )}
               </div>
             )}
@@ -137,7 +139,7 @@ export function FlightCard({ flight, isHost, currentUserUid, onRemoved }: Props)
                 href={flight.directionsUrl}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-block rounded-lg bg-blue-600 px-3 py-1.5 text-xs font-medium text-white transition hover:bg-blue-700"
+                className="inline-block rounded-lg bg-rose-800 px-3 py-1.5 text-xs font-medium text-white transition hover:bg-rose-900"
               >
                 Directions
               </a>
@@ -150,7 +152,7 @@ export function FlightCard({ flight, isHost, currentUserUid, onRemoved }: Props)
       {isPassenger && !isHost && (
         <button
           onClick={handleRemove}
-          className="mt-3 text-xs text-red-500 hover:underline"
+          className="mt-3 text-xs text-red-500 hover:underline dark:text-red-400"
         >
           Remove me from this flight
         </button>

@@ -36,6 +36,20 @@ export interface Membership {
   role: MemberRole;
   displayName: string;
   photoURL: string | null;
+  isManual?: boolean;
+}
+
+export interface GuestMergedNotification {
+  id: string;
+  type: "guest_merged";
+  hostUid: string;
+  tripId: string;
+  tripName: string;
+  manualDisplayName: string;
+  realDisplayName: string;
+  realPhotoURL: string | null;
+  createdAt: string;
+  read: boolean;
 }
 
 export interface Invite {
@@ -51,6 +65,7 @@ export interface Invite {
 
 export type FlightDirection = "arrival" | "departure";
 export type FlightStatus =
+  | "pending"
   | "scheduled"
   | "departed"
   | "en_route"

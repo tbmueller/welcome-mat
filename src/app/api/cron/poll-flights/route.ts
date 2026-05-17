@@ -37,6 +37,8 @@ export async function GET(req: NextRequest) {
 
     const toUpdate = snap.docs.filter((d) => {
       const data = d.data();
+      // Always re-poll pending flights (AeroAPI had no data when they were added)
+      if (data.status === "pending") return true;
       const relevantTime =
         data.direction === "arrival"
           ? data.estimatedArrival ?? data.scheduledArrival
@@ -53,8 +55,10 @@ export async function GET(req: NextRequest) {
       const data = doc.data();
       try {
         const freshData = await fetchFlightStatus(data.flightNumber, data.date);
-        await doc.ref.update(freshData);
-        updated++;
+        if (freshData) {
+          await doc.ref.update(freshData);
+          updated++;
+        }
       } catch {
         errors++;
       }

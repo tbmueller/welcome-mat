@@ -36,14 +36,16 @@ async function request<T>(
     });
     if (!retry.ok) {
       const err = await retry.json().catch(() => ({ error: retry.statusText }));
-      throw new Error(err.error ?? "Request failed");
+      const msg = typeof err.error === "string" ? err.error : (err.message ?? JSON.stringify(err.error) ?? "Request failed");
+      throw new Error(msg);
     }
     return retry.json() as Promise<T>;
   }
 
   if (!res.ok) {
     const err = await res.json().catch(() => ({ error: res.statusText }));
-    throw new Error(err.error ?? "Request failed");
+    const msg = typeof err.error === "string" ? err.error : (err.message ?? JSON.stringify(err.error) ?? "Request failed");
+    throw new Error(msg);
   }
 
   return res.json() as Promise<T>;
