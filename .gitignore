@@ -33,6 +33,9 @@ yarn-error.log*
 # env files — never commit secrets
 .env*
 
+# Claude Code local settings — may contain API keys from allowed commands
+.claude/settings.local.json
+
 # Firebase service account — NEVER commit
 *serviceAccount*.json
 firebase-adminsdk*.json
