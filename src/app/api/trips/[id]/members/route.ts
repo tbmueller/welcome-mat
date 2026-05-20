@@ -110,13 +110,30 @@ export async function DELETE(
   const batch = adminDb.batch();
   batch.delete(adminDb.collection("memberships").doc(targetMembershipId));
 
-  // Also remove all their Passenger records for this trip
+  // Remove all their Passenger records for this trip
   const passengerSnap = await adminDb
     .collection("passengers")
     .where("tripId", "==", tripId)
     .where("userUid", "==", userUid)
     .get();
   passengerSnap.docs.forEach((d) => batch.delete(d.ref));
+
+  // For each flight they were on, delete the Flight doc if they were the last passenger
+  const flightIds = [...new Set(passengerSnap.docs.map((d) => d.data().flightId as string))];
+  await Promise.all(
+    flightIds.map(async (flightId) => {
+      const remainingSnap = await adminDb
+        .collection("passengers")
+        .where("flightId", "==", flightId)
+        .get();
+      const remainingAfterDelete = remainingSnap.docs.filter(
+        (d) => d.data().userUid !== userUid
+      );
+      if (remainingAfterDelete.length === 0) {
+        batch.delete(adminDb.collection("flights").doc(flightId));
+      }
+    })
+  );
 
   await batch.commit();
   return NextResponse.json({ ok: true });
