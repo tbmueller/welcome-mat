@@ -80,7 +80,7 @@ export function AddFlightModal({ tripId, isHost, members = [], onClose, onAdded 
   }
 
   const inputCls =
-    "w-full rounded-lg border border-taupe-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-rose-700 dark:border-taupe-600 dark:bg-taupe-700 dark:text-taupe-100";
+    "w-full rounded-lg border border-taupe-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-pink-900 dark:border-taupe-600 dark:bg-taupe-700 dark:text-taupe-100";
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 px-4">
@@ -96,7 +96,7 @@ export function AddFlightModal({ tripId, isHost, members = [], onClose, onAdded 
               onClick={() => setDirection(d)}
               className={`flex-1 rounded-md py-1.5 text-sm font-medium transition ${
                 direction === d
-                  ? "bg-rose-800 text-white"
+                  ? "bg-pink-900 text-white"
                   : "text-taupe-500 hover:text-taupe-800 dark:text-taupe-400 dark:hover:text-taupe-200"
               }`}
             >
@@ -128,8 +128,8 @@ export function AddFlightModal({ tripId, isHost, members = [], onClose, onAdded 
                       onClick={() => pickGuest(m)}
                       className={`rounded-full border px-2.5 py-0.5 text-xs font-medium transition ${
                         selectedGuestUid === m.userUid
-                          ? "border-rose-700 bg-rose-50 text-rose-900 dark:bg-rose-900/40 dark:text-rose-400"
-                          : "border-taupe-300 text-taupe-600 hover:border-rose-600 hover:text-rose-800 dark:border-taupe-600 dark:text-taupe-400 dark:hover:border-rose-700 dark:hover:text-rose-600"
+                          ? "border-pink-900 bg-pink-50 text-pink-900 dark:bg-pink-900/40 dark:text-pink-400"
+                          : "border-taupe-300 text-taupe-600 hover:border-pink-400 hover:text-pink-900 dark:border-taupe-600 dark:text-taupe-400 dark:hover:border-pink-900 dark:hover:text-pink-400"
                       }`}
                     >
                       {m.displayName}
@@ -180,7 +180,7 @@ export function AddFlightModal({ tripId, isHost, members = [], onClose, onAdded 
             <button
               type="submit"
               disabled={loading}
-              className="flex-1 rounded-lg bg-rose-800 py-2 text-sm font-medium text-white transition hover:bg-rose-900 disabled:opacity-50"
+              className="flex-1 rounded-lg bg-pink-900 py-2 text-sm font-medium text-white transition hover:bg-pink-900 disabled:opacity-50"
             >
               {loading ? "Searching…" : "Add"}
             </button>

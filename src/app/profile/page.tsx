@@ -70,12 +70,12 @@ export default function ProfilePage() {
   if (loading || fetching) {
     return (
       <div className="flex min-h-screen items-center justify-center">
-        <div className="h-8 w-8 animate-spin rounded-full border-4 border-rose-800 border-t-transparent" />
+        <div className="h-8 w-8 animate-spin rounded-full border-4 border-pink-900 border-t-transparent" />
       </div>
     );
   }
 
-  const inputCls = "w-full rounded-lg border border-taupe-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-rose-700 dark:border-taupe-600 dark:bg-taupe-700 dark:text-taupe-100 dark:placeholder-taupe-400";
+  const inputCls = "w-full rounded-lg border border-taupe-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-pink-900 dark:border-taupe-600 dark:bg-taupe-700 dark:text-taupe-100 dark:placeholder-taupe-400";
 
   return (
     <div className="mx-auto max-w-lg px-4 py-10">
@@ -99,7 +99,7 @@ export default function ProfilePage() {
               <p className="font-medium">
                 {addr.label}
                 {addr.isDefault && (
-                  <span className="ml-2 rounded-full bg-rose-100 px-2 py-0.5 text-xs text-rose-900 dark:bg-rose-900 dark:text-rose-400">
+                  <span className="ml-2 rounded-full bg-pink-100 px-2 py-0.5 text-xs text-pink-900 dark:bg-pink-900 dark:text-pink-400">
                     Default
                   </span>
                 )}
@@ -110,7 +110,7 @@ export default function ProfilePage() {
               {!addr.isDefault && (
                 <button
                   onClick={() => handleSetDefault(addr.id)}
-                  className="text-xs text-rose-800 hover:underline dark:text-rose-600"
+                  className="text-xs text-pink-900 hover:underline dark:text-pink-400"
                 >
                   Set default
                 </button>
@@ -165,7 +165,7 @@ export default function ProfilePage() {
             <button
               type="submit"
               disabled={saving}
-              className="flex-1 rounded-lg bg-rose-800 py-2 text-sm font-medium text-white hover:bg-rose-900 disabled:opacity-50"
+              className="flex-1 rounded-lg bg-pink-900 py-2 text-sm font-medium text-white hover:bg-pink-900 disabled:opacity-50"
             >
               {saving ? "Saving…" : "Save"}
             </button>
@@ -174,7 +174,7 @@ export default function ProfilePage() {
       ) : (
         <button
           onClick={() => setShowAdd(true)}
-          className="w-full rounded-lg border-2 border-dashed border-taupe-300 py-3 text-sm text-taupe-500 transition hover:border-rose-600 hover:text-rose-800 dark:border-taupe-600 dark:text-taupe-400 dark:hover:border-rose-700 dark:hover:text-rose-600"
+          className="w-full rounded-lg border-2 border-dashed border-taupe-300 py-3 text-sm text-taupe-500 transition hover:border-pink-400 hover:text-pink-900 dark:border-taupe-600 dark:text-taupe-400 dark:hover:border-pink-900 dark:hover:text-pink-400"
         >
           + Add address
         </button>

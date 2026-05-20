@@ -40,7 +40,7 @@ export default function DashboardPage() {
   if (loading || fetching) {
     return (
       <div className="flex min-h-screen items-center justify-center">
-        <div className="h-8 w-8 animate-spin rounded-full border-4 border-rose-800 border-t-transparent" />
+        <div className="h-8 w-8 animate-spin rounded-full border-4 border-pink-900 border-t-transparent" />
       </div>
     );
   }
@@ -50,8 +50,8 @@ export default function DashboardPage() {
       {notifications.length > 0 && (
         <ul className="mb-6 space-y-2">
           {notifications.map((n) => (
-            <li key={n.id} className="flex items-start justify-between gap-3 rounded-xl border border-rose-200 bg-rose-50 px-4 py-3 text-sm dark:border-rose-900 dark:bg-rose-950">
-              <p className="text-rose-900 dark:text-rose-100">
+            <li key={n.id} className="flex items-start justify-between gap-3 rounded-xl border border-pink-200 bg-pink-50 px-4 py-3 text-sm dark:border-pink-900 dark:bg-pink-950">
+              <p className="text-pink-900 dark:text-pink-100">
                 <span className="font-semibold">{n.realDisplayName}</span> joined your trip{" "}
                 <Link href={`/trip/${n.tripId}`} className="underline hover:no-underline">
                   {n.tripName}
@@ -61,7 +61,7 @@ export default function DashboardPage() {
               </p>
               <button
                 onClick={() => dismissNotification(n.id)}
-                className="mt-0.5 shrink-0 text-rose-600 hover:text-rose-800 dark:text-rose-700 dark:hover:text-rose-400"
+                className="mt-0.5 shrink-0 text-pink-400 hover:text-pink-900 dark:text-pink-900 dark:hover:text-pink-400"
                 aria-label="Dismiss"
               >
                 ✕
@@ -88,7 +88,7 @@ export default function DashboardPage() {
 
       <button
         onClick={() => setShowCreate(true)}
-        className="mb-6 w-full rounded-lg border-2 border-dashed border-taupe-300 py-4 text-sm text-taupe-500 transition hover:border-rose-600 hover:text-rose-800 dark:border-taupe-600 dark:text-taupe-400 dark:hover:border-rose-700 dark:hover:text-rose-600"
+        className="mb-6 w-full rounded-lg border-2 border-dashed border-taupe-300 py-4 text-sm text-taupe-500 transition hover:border-pink-400 hover:text-pink-900 dark:border-taupe-600 dark:text-taupe-400 dark:hover:border-pink-900 dark:hover:text-pink-400"
       >
         + New trip
       </button>

@@ -66,7 +66,7 @@ export function CreateTripModal({ onClose, onCreated }: Props) {
     }
   }
 
-  const inputCls = "w-full rounded-lg border border-taupe-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-rose-700 dark:border-taupe-600 dark:bg-taupe-700 dark:text-taupe-100 dark:placeholder-taupe-400";
+  const inputCls = "w-full rounded-lg border border-taupe-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-pink-900 dark:border-taupe-600 dark:bg-taupe-700 dark:text-taupe-100 dark:placeholder-taupe-400";
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 px-4">
@@ -178,7 +178,7 @@ export function CreateTripModal({ onClose, onCreated }: Props) {
             <button
               type="submit"
               disabled={loading}
-              className="flex-1 rounded-lg bg-rose-800 py-2 text-sm font-medium text-white transition hover:bg-rose-900 disabled:opacity-50"
+              className="flex-1 rounded-lg bg-pink-900 py-2 text-sm font-medium text-white transition hover:bg-pink-900 disabled:opacity-50"
             >
               {loading ? "Creating…" : "Create"}
             </button>

@@ -142,14 +142,14 @@ export default function TripSettingsPage() {
   if (loading || fetching) {
     return (
       <div className="flex min-h-screen items-center justify-center">
-        <div className="h-8 w-8 animate-spin rounded-full border-4 border-rose-800 border-t-transparent" />
+        <div className="h-8 w-8 animate-spin rounded-full border-4 border-pink-900 border-t-transparent" />
       </div>
     );
   }
 
   if (!trip) return null;
 
-  const inputCls = "w-full rounded-lg border border-taupe-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-rose-700 dark:border-taupe-600 dark:bg-taupe-700 dark:text-taupe-100 dark:placeholder-taupe-400";
+  const inputCls = "w-full rounded-lg border border-taupe-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-pink-900 dark:border-taupe-600 dark:bg-taupe-700 dark:text-taupe-100 dark:placeholder-taupe-400";
 
   return (
     <div className="mx-auto max-w-lg px-4 py-8">
@@ -228,7 +228,7 @@ export default function TripSettingsPage() {
         <button
           type="submit"
           disabled={saving}
-          className="w-full rounded-lg bg-rose-800 py-2 text-sm font-medium text-white transition hover:bg-rose-900 disabled:opacity-50"
+          className="w-full rounded-lg bg-pink-900 py-2 text-sm font-medium text-white transition hover:bg-pink-900 disabled:opacity-50"
         >
           {saving ? "Saving…" : "Save changes"}
         </button>
@@ -240,7 +240,7 @@ export default function TripSettingsPage() {
           <h2 className="font-semibold text-taupe-700 dark:text-taupe-300">Guests</h2>
           <button
             onClick={() => setShowInvite(true)}
-            className="text-xs font-medium text-rose-800 hover:underline dark:text-rose-600"
+            className="text-xs font-medium text-pink-900 hover:underline dark:text-pink-400"
           >
             + Invite
           </button>
@@ -281,12 +281,12 @@ export default function TripSettingsPage() {
             value={newGuestName}
             onChange={(e) => setNewGuestName(e.target.value)}
             placeholder="Add guest by name…"
-            className="min-w-0 flex-1 rounded-lg border border-taupe-300 px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-rose-700 dark:border-taupe-600 dark:bg-taupe-700 dark:text-taupe-100 dark:placeholder-taupe-400"
+            className="min-w-0 flex-1 rounded-lg border border-taupe-300 px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-pink-900 dark:border-taupe-600 dark:bg-taupe-700 dark:text-taupe-100 dark:placeholder-taupe-400"
           />
           <button
             type="submit"
             disabled={addingGuest || !newGuestName.trim()}
-            className="rounded-lg bg-rose-800 px-3 py-1.5 text-sm font-medium text-white transition hover:bg-rose-900 disabled:opacity-50"
+            className="rounded-lg bg-pink-900 px-3 py-1.5 text-sm font-medium text-white transition hover:bg-pink-900 disabled:opacity-50"
           >
             Add
           </button>

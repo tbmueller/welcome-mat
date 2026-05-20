@@ -15,7 +15,7 @@ export default function Home() {
   if (loading) {
     return (
       <div className="flex min-h-screen items-center justify-center">
-        <div className="h-8 w-8 animate-spin rounded-full border-4 border-rose-800 border-t-transparent" />
+        <div className="h-8 w-8 animate-spin rounded-full border-4 border-pink-900 border-t-transparent" />
       </div>
     );
   }

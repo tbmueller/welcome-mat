@@ -9,8 +9,8 @@ type ExtendedFlight = FlightWithPassengers & { directionsUrl?: string };
 const STATUS_STYLES: Record<FlightStatus, string> = {
   pending: "bg-yellow-50 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-400",
   scheduled: "bg-taupe-100 text-taupe-600 dark:bg-taupe-700 dark:text-taupe-300",
-  departed: "bg-rose-100 text-rose-900 dark:bg-rose-900 dark:text-rose-400",
-  en_route: "bg-rose-100 text-rose-900 dark:bg-rose-900 dark:text-rose-400",
+  departed: "bg-pink-100 text-pink-900 dark:bg-pink-900 dark:text-pink-400",
+  en_route: "bg-pink-100 text-pink-900 dark:bg-pink-900 dark:text-pink-400",
   landed: "bg-green-100 text-green-700 dark:bg-green-900 dark:text-green-300",
   arrived: "bg-green-100 text-green-700 dark:bg-green-900 dark:text-green-300",
   cancelled: "bg-red-100 text-red-700 dark:bg-red-900 dark:text-red-300",
@@ -126,7 +126,7 @@ export function FlightCard({ flight, isHost, currentUserUid, onRemoved }: Props)
             {flight.leaveBy && (
               <div className="mb-1">
                 <p className="text-xs text-taupe-400 dark:text-taupe-500">Leave by</p>
-                <p className="font-semibold text-rose-900 dark:text-rose-600">
+                <p className="font-semibold text-pink-900 dark:text-pink-400">
                   {format(parseISO(flight.leaveBy), "h:mm a")}
                 </p>
                 {flight.travelMinutes && (
@@ -139,7 +139,7 @@ export function FlightCard({ flight, isHost, currentUserUid, onRemoved }: Props)
                 href={flight.directionsUrl}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-block rounded-lg bg-rose-800 px-3 py-1.5 text-xs font-medium text-white transition hover:bg-rose-900"
+                className="inline-block rounded-lg bg-pink-900 px-3 py-1.5 text-xs font-medium text-white transition hover:bg-pink-900"
               >
                 Directions
               </a>

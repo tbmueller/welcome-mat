@@ -82,7 +82,7 @@ export function InviteModal({ tripId, onClose }: Props) {
                   max={500}
                   value={maxUses}
                   onChange={(e) => setMaxUses(Math.max(1, parseInt(e.target.value) || 1))}
-                  className="w-20 rounded-lg border border-taupe-300 px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-rose-700 dark:border-taupe-600 dark:bg-taupe-700 dark:text-taupe-100"
+                  className="w-20 rounded-lg border border-taupe-300 px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-pink-900 dark:border-taupe-600 dark:bg-taupe-700 dark:text-taupe-100"
                 />
               </div>
               <button
@@ -104,13 +104,13 @@ export function InviteModal({ tripId, onClose }: Props) {
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               placeholder="friend@example.com"
-              className="min-w-0 flex-1 rounded-lg border border-taupe-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-rose-700 dark:border-taupe-600 dark:bg-taupe-700 dark:text-taupe-100 dark:placeholder-taupe-400"
+              className="min-w-0 flex-1 rounded-lg border border-taupe-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-pink-900 dark:border-taupe-600 dark:bg-taupe-700 dark:text-taupe-100 dark:placeholder-taupe-400"
               required
             />
             <button
               type="submit"
               disabled={loading}
-              className="rounded-lg bg-rose-800 px-4 py-2 text-sm font-medium text-white transition hover:bg-rose-900 disabled:opacity-50"
+              className="rounded-lg bg-pink-900 px-4 py-2 text-sm font-medium text-white transition hover:bg-pink-900 disabled:opacity-50"
             >
               Send
             </button>

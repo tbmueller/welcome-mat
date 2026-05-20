@@ -110,7 +110,7 @@ export default function TripPage() {
   if (loading || fetching) {
     return (
       <div className="flex min-h-screen items-center justify-center">
-        <div className="h-8 w-8 animate-spin rounded-full border-4 border-rose-800 border-t-transparent" />
+        <div className="h-8 w-8 animate-spin rounded-full border-4 border-pink-900 border-t-transparent" />
       </div>
     );
   }
@@ -140,7 +140,7 @@ export default function TripPage() {
           <div className="flex items-center gap-2">
             <button
               onClick={() => setShowInvite(true)}
-              className="rounded-lg bg-rose-800 px-4 py-2 text-sm font-medium text-white transition hover:bg-rose-900"
+              className="rounded-lg bg-pink-900 px-4 py-2 text-sm font-medium text-white transition hover:bg-pink-900"
             >
               Invite guests
             </button>
@@ -221,7 +221,7 @@ export default function TripPage() {
 
       <button
         onClick={() => setShowAddFlight(true)}
-        className="w-full rounded-lg border-2 border-dashed border-taupe-300 py-3 text-sm text-taupe-500 transition hover:border-rose-600 hover:text-rose-800 dark:border-taupe-600 dark:text-taupe-400 dark:hover:border-rose-700 dark:hover:text-rose-600"
+        className="w-full rounded-lg border-2 border-dashed border-taupe-300 py-3 text-sm text-taupe-500 transition hover:border-pink-400 hover:text-pink-900 dark:border-taupe-600 dark:text-taupe-400 dark:hover:border-pink-900 dark:hover:text-pink-400"
       >
         {isHost ? "+ Add a guest's flight" : "+ Add my flight"}
       </button>

@@ -60,7 +60,7 @@ export function IataAutocomplete({ value, onChange, className, required }: Props
                 onMouseDown={() => handleSelect(a)}
                 className="flex w-full items-center gap-3 px-3 py-2 text-left hover:bg-taupe-50 dark:hover:bg-taupe-700"
               >
-                <span className="w-10 shrink-0 font-mono text-sm font-semibold text-rose-800 dark:text-rose-600">
+                <span className="w-10 shrink-0 font-mono text-sm font-semibold text-pink-900 dark:text-pink-400">
                   {a.iata}
                 </span>
                 <span className="min-w-0">

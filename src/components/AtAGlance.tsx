@@ -98,14 +98,14 @@ export function AtAGlance({ flights, trip, savedAddresses, onOriginChange, onRef
   if (upcoming.length === 0) return null;
 
   return (
-    <div className="mb-6 rounded-xl border border-rose-200 bg-rose-50 p-4 dark:border-rose-900 dark:bg-rose-950/30">
+    <div className="mb-6 rounded-xl border border-pink-200 bg-pink-50 p-4 dark:border-pink-900 dark:bg-pink-950/30">
       {/* Header */}
       <div className="mb-3 flex items-center justify-between">
-        <h2 className="text-sm font-semibold text-rose-900 dark:text-rose-200">At a glance</h2>
+        <h2 className="text-sm font-semibold text-pink-900 dark:text-pink-200">At a glance</h2>
         <button
           onClick={onRefresh}
           disabled={refreshing}
-          className="text-xs text-rose-800 hover:underline disabled:opacity-50 dark:text-rose-600"
+          className="text-xs text-pink-900 hover:underline disabled:opacity-50 dark:text-pink-400"
         >
           {refreshing ? "Refreshing…" : "Refresh"}
         </button>
@@ -113,11 +113,11 @@ export function AtAGlance({ flights, trip, savedAddresses, onOriginChange, onRef
 
       {/* Address picker */}
       <div className="mb-4 flex items-center gap-2">
-        <span className="text-xs text-rose-900 dark:text-rose-400 whitespace-nowrap">Departing from</span>
+        <span className="text-xs text-pink-900 dark:text-pink-400 whitespace-nowrap">Departing from</span>
         <select
           value={selectedOriginId}
           onChange={(e) => handleOriginChange(e.target.value)}
-          className="min-w-0 flex-1 rounded-lg border border-rose-400 bg-white px-2 py-1 text-xs focus:outline-none focus:ring-2 focus:ring-rose-700 dark:border-rose-900 dark:bg-taupe-800 dark:text-taupe-100"
+          className="min-w-0 flex-1 rounded-lg border border-pink-400 bg-white px-2 py-1 text-xs focus:outline-none focus:ring-2 focus:ring-pink-900 dark:border-pink-900 dark:bg-taupe-800 dark:text-taupe-100"
         >
           {origins.map((o) => (
             <option key={o.id} value={o.id}>
@@ -154,7 +154,7 @@ export function AtAGlance({ flights, trip, savedAddresses, onOriginChange, onRef
                 )}
               </div>
               {ms !== null && (
-                <span className={`text-xs font-medium tabular-nums ${ms < 0 ? "text-taupe-400 dark:text-taupe-500" : "text-rose-900 dark:text-rose-400"}`}>
+                <span className={`text-xs font-medium tabular-nums ${ms < 0 ? "text-taupe-400 dark:text-taupe-500" : "text-pink-900 dark:text-pink-400"}`}>
                   {ms < 0 ? `${formatCountdown(-ms)} ago` : `in ${formatCountdown(ms)}`}
                 </span>
               )}
@@ -177,7 +177,7 @@ export function AtAGlance({ flights, trip, savedAddresses, onOriginChange, onRef
                   href={f.directionsUrl}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="shrink-0 text-rose-800 hover:underline dark:text-rose-600"
+                  className="shrink-0 text-pink-900 hover:underline dark:text-pink-400"
                 >
                   Directions ↗
                 </a>

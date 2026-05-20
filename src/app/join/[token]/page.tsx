@@ -28,7 +28,7 @@ export default function JoinPage() {
   if (loading) {
     return (
       <div className="flex min-h-screen items-center justify-center">
-        <div className="h-8 w-8 animate-spin rounded-full border-4 border-rose-800 border-t-transparent" />
+        <div className="h-8 w-8 animate-spin rounded-full border-4 border-pink-900 border-t-transparent" />
       </div>
     );
   }
@@ -55,7 +55,7 @@ export default function JoinPage() {
         <p className="text-red-600 dark:text-red-400">{errorMsg}</p>
         <button
           onClick={() => router.push("/dashboard")}
-          className="text-sm text-rose-800 hover:underline dark:text-rose-600"
+          className="text-sm text-pink-900 hover:underline dark:text-pink-400"
         >
           Go to dashboard
         </button>
@@ -65,7 +65,7 @@ export default function JoinPage() {
 
   return (
     <div className="flex min-h-screen items-center justify-center">
-      <div className="h-8 w-8 animate-spin rounded-full border-4 border-rose-800 border-t-transparent" />
+      <div className="h-8 w-8 animate-spin rounded-full border-4 border-pink-900 border-t-transparent" />
     </div>
   );
 }
