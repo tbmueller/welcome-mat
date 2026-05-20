@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { api } from "@/lib/apiClient";
 import { useAuth } from "@/hooks/useAuth";
+import { Modal } from "@/components/Modal";
 
 interface Member {
   userUid: string;
@@ -83,10 +84,7 @@ export function AddFlightModal({ tripId, isHost, members = [], onClose, onAdded 
     "w-full rounded-lg border border-taupe-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-pink-900 dark:border-taupe-600 dark:bg-taupe-700 dark:text-taupe-100";
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 px-4">
-      <div className="w-full max-w-sm rounded-2xl bg-white p-6 shadow-xl dark:bg-taupe-800">
-        <h2 className="mb-4 text-lg font-semibold">Add flight</h2>
-
+    <Modal title="Add flight" onClose={onClose}>
         {/* Arrival / Departure toggle */}
         <div className="mb-4 flex rounded-lg border border-taupe-200 p-1 dark:border-taupe-600">
           {(["arrival", "departure"] as const).map((d) => (
@@ -180,13 +178,12 @@ export function AddFlightModal({ tripId, isHost, members = [], onClose, onAdded 
             <button
               type="submit"
               disabled={loading}
-              className="flex-1 rounded-lg bg-pink-900 py-2 text-sm font-medium text-white transition hover:bg-pink-900 disabled:opacity-50"
+              className="flex-1 rounded-lg bg-pink-900 py-2 text-sm font-medium text-white transition hover:bg-pink-900/70 active:bg-pink-950 disabled:opacity-50"
             >
               {loading ? "Searching…" : "Add"}
             </button>
           </div>
         </form>
-      </div>
-    </div>
+    </Modal>
   );
 }

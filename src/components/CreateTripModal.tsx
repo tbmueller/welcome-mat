@@ -5,6 +5,7 @@ import { api } from "@/lib/apiClient";
 import type { SavedAddress } from "@/types";
 import { AddressAutocomplete } from "@/components/AddressAutocomplete";
 import { IataAutocomplete } from "@/components/IataAutocomplete";
+import { Modal } from "@/components/Modal";
 
 interface Props {
   onClose: () => void;
@@ -69,9 +70,7 @@ export function CreateTripModal({ onClose, onCreated }: Props) {
   const inputCls = "w-full rounded-lg border border-taupe-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-pink-900 dark:border-taupe-600 dark:bg-taupe-700 dark:text-taupe-100 dark:placeholder-taupe-400";
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 px-4">
-      <div className="w-full max-w-sm rounded-2xl bg-white p-6 shadow-xl dark:bg-taupe-800">
-        <h2 className="mb-4 text-lg font-semibold">New trip</h2>
+    <Modal title="New trip" onClose={onClose}>
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
             <label className="mb-1 block text-sm font-medium text-taupe-700 dark:text-taupe-300">
@@ -178,13 +177,12 @@ export function CreateTripModal({ onClose, onCreated }: Props) {
             <button
               type="submit"
               disabled={loading}
-              className="flex-1 rounded-lg bg-pink-900 py-2 text-sm font-medium text-white transition hover:bg-pink-900 disabled:opacity-50"
+              className="flex-1 rounded-lg bg-pink-900 py-2 text-sm font-medium text-white transition hover:bg-pink-900/70 active:bg-pink-950 disabled:opacity-50"
             >
               {loading ? "Creating…" : "Create"}
             </button>
           </div>
         </form>
-      </div>
-    </div>
+    </Modal>
   );
 }

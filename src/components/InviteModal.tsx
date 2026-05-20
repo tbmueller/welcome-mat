@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { api } from "@/lib/apiClient";
+import { Modal } from "@/components/Modal";
 
 interface Props {
   tripId: string;
@@ -51,12 +52,10 @@ export function InviteModal({ tripId, onClose }: Props) {
   }
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 px-4">
-      <div className="w-full max-w-sm rounded-2xl bg-white p-6 shadow-xl dark:bg-taupe-800">
-        <h2 className="mb-4 text-lg font-semibold">Invite guests</h2>
+    <Modal title="Invite guests" onClose={onClose}>
 
         {/* Link invite */}
-        <div className="mb-5">
+        <div className="mb-4 rounded-xl border border-taupe-200 p-4 dark:border-taupe-700">
           <p className="mb-2 text-sm font-medium text-taupe-700 dark:text-taupe-300">Share a link</p>
           {inviteUrl ? (
             <div className="flex gap-2">
@@ -96,7 +95,7 @@ export function InviteModal({ tripId, onClose }: Props) {
           )}
         </div>
 
-        <div className="mb-5">
+        <div className="mb-4 rounded-xl border border-taupe-200 p-4 dark:border-taupe-700">
           <p className="mb-2 text-sm font-medium text-taupe-700 dark:text-taupe-300">Or invite by email</p>
           <form onSubmit={sendEmail} className="flex gap-2">
             <input
@@ -110,7 +109,7 @@ export function InviteModal({ tripId, onClose }: Props) {
             <button
               type="submit"
               disabled={loading}
-              className="rounded-lg bg-pink-900 px-4 py-2 text-sm font-medium text-white transition hover:bg-pink-900 disabled:opacity-50"
+              className="rounded-lg bg-pink-900 px-4 py-2 text-sm font-medium text-white transition hover:bg-pink-900/70 active:bg-pink-950 disabled:opacity-50"
             >
               Send
             </button>
@@ -125,7 +124,6 @@ export function InviteModal({ tripId, onClose }: Props) {
         >
           Done
         </button>
-      </div>
-    </div>
+    </Modal>
   );
 }

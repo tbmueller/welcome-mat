@@ -14,6 +14,7 @@
     "@capacitor/core": "^8.3.4",
     "@capacitor/ios": "^8.3.4",
     "@capacitor/push-notifications": "^8.1.1",
+    "@radix-ui/react-dialog": "^1.1.15",
     "@upstash/qstash": "^2.11.0",
     "@upstash/ratelimit": "^2.0.8",
     "@upstash/redis": "^1.38.0",
