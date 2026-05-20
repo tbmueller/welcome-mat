@@ -79,7 +79,7 @@ export default function DashboardPage() {
           </Link>
           <button
             onClick={signOut}
-            className="text-sm text-taupe-500 hover:text-taupe-800 dark:text-taupe-400 dark:hover:text-taupe-200"
+            className="text-sm text-pink-900 hover:text-pink-900/60 active:text-pink-950 dark:text-pink-400 dark:hover:text-pink-400/60 dark:active:text-pink-200"
           >
             Sign out
           </button>

@@ -139,7 +139,7 @@ export function FlightCard({ flight, isHost, currentUserUid, onRemoved }: Props)
                 href={flight.directionsUrl}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-block rounded-lg bg-pink-900 px-3 py-1.5 text-xs font-medium text-white transition hover:bg-pink-900"
+                className="inline-block rounded-lg bg-pink-900 px-3 py-1.5 text-xs font-medium text-white transition hover:bg-pink-900/70 active:bg-pink-950"
               >
                 Directions
               </a>

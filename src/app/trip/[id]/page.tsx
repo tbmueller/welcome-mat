@@ -140,7 +140,7 @@ export default function TripPage() {
           <div className="flex items-center gap-2">
             <button
               onClick={() => setShowInvite(true)}
-              className="rounded-lg bg-pink-900 px-4 py-2 text-sm font-medium text-white transition hover:bg-pink-900"
+              className="rounded-lg bg-pink-900 px-4 py-2 text-sm font-medium text-white transition hover:bg-pink-900/70 active:bg-pink-950"
             >
               Invite guests
             </button>
@@ -148,7 +148,7 @@ export default function TripPage() {
               href={`/trip/${tripId}/settings`}
               className="rounded-lg border border-taupe-300 px-3 py-2 text-sm font-medium text-taupe-600 transition hover:bg-taupe-50 dark:border-taupe-600 dark:text-taupe-300 dark:hover:bg-taupe-700"
             >
-              Settings
+              Trip settings
             </Link>
           </div>
         )}

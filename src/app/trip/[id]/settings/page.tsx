@@ -228,7 +228,7 @@ export default function TripSettingsPage() {
         <button
           type="submit"
           disabled={saving}
-          className="w-full rounded-lg bg-pink-900 py-2 text-sm font-medium text-white transition hover:bg-pink-900 disabled:opacity-50"
+          className="w-full rounded-lg bg-pink-900 py-2 text-sm font-medium text-white transition hover:bg-pink-900/70 active:bg-pink-950 disabled:opacity-50"
         >
           {saving ? "Saving…" : "Save changes"}
         </button>
@@ -286,7 +286,7 @@ export default function TripSettingsPage() {
           <button
             type="submit"
             disabled={addingGuest || !newGuestName.trim()}
-            className="rounded-lg bg-pink-900 px-3 py-1.5 text-sm font-medium text-white transition hover:bg-pink-900 disabled:opacity-50"
+            className="rounded-lg bg-pink-900 px-3 py-1.5 text-sm font-medium text-white transition hover:bg-pink-900/70 active:bg-pink-950 disabled:opacity-50"
           >
             Add
           </button>
