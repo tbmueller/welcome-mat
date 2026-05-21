@@ -4,6 +4,8 @@ import { createContext, useCallback, useEffect, useMemo, useState, ReactNode } f
 import {
   onAuthStateChanged,
   signInWithPopup,
+  signInWithRedirect,
+  getRedirectResult,
   signOut as firebaseSignOut,
   User as FirebaseUser,
 } from "firebase/auth";
@@ -15,6 +17,7 @@ interface AuthContextValue {
   user: User | null;
   firebaseUser: FirebaseUser | null;
   loading: boolean;
+  signingIn: boolean;
   signIn: () => Promise<void>;
   signOut: () => Promise<void>;
   getIdToken: () => Promise<string>;
@@ -26,8 +29,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [firebaseUser, setFirebaseUser] = useState<FirebaseUser | null>(null);
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
+  const [signingIn, setSigningIn] = useState(false);
 
   useEffect(() => {
+    // Process any pending redirect result (fires after signInWithRedirect returns)
+    getRedirectResult(auth).catch(() => {});
+
     const unsub = onAuthStateChanged(auth, async (fbUser) => {
       if (fbUser) {
         setFirebaseUser(fbUser);
@@ -63,13 +70,30 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         setFirebaseUser(null);
         setUser(null);
       }
+      setSigningIn(false);
       setLoading(false);
     });
     return unsub;
   }, []);
 
   const signIn = useCallback(async () => {
-    await signInWithPopup(auth, googleProvider);
+    setSigningIn(true);
+    try {
+      await signInWithPopup(auth, googleProvider);
+    } catch (err: unknown) {
+      const code = (err as { code?: string }).code;
+      if (code === "auth/popup-blocked") {
+        // Browser blocked the popup — fall back to redirect (navigates away, result handled on return)
+        await signInWithRedirect(auth, googleProvider);
+        return; // page will reload; signingIn stays true intentionally
+      }
+      // User closed the popup or cancelled — not an error
+      if (code !== "auth/popup-closed-by-user" && code !== "auth/cancelled-popup-request") {
+        setSigningIn(false);
+        throw err;
+      }
+      setSigningIn(false);
+    }
   }, []);
 
   const signOut = useCallback(async () => {
@@ -82,8 +106,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, [firebaseUser]);
 
   const value = useMemo(
-    () => ({ user, firebaseUser, loading, signIn, signOut, getIdToken }),
-    [user, firebaseUser, loading, signIn, signOut, getIdToken]
+    () => ({ user, firebaseUser, loading, signingIn, signIn, signOut, getIdToken }),
+    [user, firebaseUser, loading, signingIn, signIn, signOut, getIdToken]
   );
 
   return (
