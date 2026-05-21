@@ -2,6 +2,7 @@
 
 import { useEffect } from "react";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 import { useAuth } from "@/hooks/useAuth";
 import { MatLogo } from "@/components/MatLogo";
 
@@ -58,6 +59,13 @@ export default function Home() {
           </p>
         )}
       </div>
+
+      <p className="text-xs text-[var(--gray-10)]">
+        By signing in you agree to our{" "}
+        <Link href="/terms" className="underline hover:text-[var(--gray-12)]">Terms of Service</Link>
+        {" "}and{" "}
+        <Link href="/privacy" className="underline hover:text-[var(--gray-12)]">Privacy Policy</Link>.
+      </p>
     </div>
   );
 }
