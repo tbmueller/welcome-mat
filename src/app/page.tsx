@@ -3,6 +3,7 @@
 import { useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/hooks/useAuth";
+import { MatLogo } from "@/components/MatLogo";
 
 export default function Home() {
   const { user, loading, signingIn, signIn } = useAuth();
@@ -22,11 +23,14 @@ export default function Home() {
 
   return (
     <div className="flex min-h-screen flex-col items-center justify-center gap-8 px-4">
-      <div className="text-center">
-        <h1 className="text-4xl font-bold tracking-tight">WelcomeMat</h1>
-        <p className="mt-3 text-taupe-500 dark:text-taupe-400">
-          Track your guests&apos; flights and know exactly when to leave.
-        </p>
+      <div className="flex flex-col items-center gap-4 text-center">
+        <MatLogo width={192} height={112} />
+        <div>
+          <h1 className="text-4xl font-bold tracking-tight">WelcomeMat</h1>
+          <p className="mt-3 text-taupe-500 dark:text-taupe-400">
+            Track your guests&apos; flights and know exactly when to leave.
+          </p>
+        </div>
       </div>
 
       <div className="flex flex-col items-center gap-3">
