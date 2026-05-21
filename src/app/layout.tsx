@@ -10,6 +10,9 @@ const inter = Inter({ subsets: ["latin"] });
 export const metadata: Metadata = {
   title: "WelcomeMat",
   description: "Track your guests' flights",
+  verification: {
+    google: "LmJYkYRdAYhuB01a-n1rLmUSWrF_sITwutRH28UirEI",
+  },
 };
 
 export default function RootLayout({
