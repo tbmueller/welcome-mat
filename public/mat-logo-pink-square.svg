@@ -1,0 +1,164 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 192 192" width="512" height="512" shape-rendering="crispEdges">
+  <defs>
+    <pattern id="cb" x="0" y="0" width="8" height="8" patternUnits="userSpaceOnUse">
+      <rect width="4" height="4" fill="#c2298a"/>
+      <rect x="4" y="0" width="4" height="4" fill="#d6409f"/>
+      <rect x="0" y="4" width="4" height="4" fill="#d6409f"/>
+      <rect x="4" y="4" width="4" height="4" fill="#c2298a"/>
+    </pattern>
+  </defs>
+
+  <!-- Outer dark border -->
+  <rect x="0"   y="0"   width="192" height="8"   fill="#651249"/>
+  <rect x="0"   y="184" width="192" height="8"   fill="#651249"/>
+  <rect x="0"   y="8"   width="8"   height="176" fill="#651249"/>
+  <rect x="184" y="8"   width="8"   height="176" fill="#651249"/>
+
+  <!-- Checkerboard inner border -->
+  <rect x="8"   y="8"   width="176" height="8"   fill="url(#cb)"/>
+  <rect x="8"   y="176" width="176" height="8"   fill="url(#cb)"/>
+  <rect x="8"   y="16"  width="8"   height="160" fill="url(#cb)"/>
+  <rect x="176" y="16"  width="8"   height="160" fill="url(#cb)"/>
+
+  <!-- Solid separator -->
+  <rect x="16"  y="16"  width="160" height="4"   fill="#c2298a"/>
+  <rect x="16"  y="172" width="160" height="4"   fill="#c2298a"/>
+  <rect x="16"  y="20"  width="4"   height="152" fill="#c2298a"/>
+  <rect x="172" y="20"  width="4"   height="152" fill="#c2298a"/>
+
+  <!-- Interior field -->
+  <rect x="20" y="20" width="152" height="152" fill="#ecb0d4"/>
+
+  <!-- Corner accent squares -->
+  <rect x="20"  y="20"  width="8" height="8" fill="#c2298a"/>
+  <rect x="164" y="20"  width="8" height="8" fill="#c2298a"/>
+  <rect x="20"  y="164" width="8" height="8" fill="#c2298a"/>
+  <rect x="164" y="164" width="8" height="8" fill="#c2298a"/>
+
+  <!-- Rose ring (pink) — diamond centered at (96,96), tip-to-tip 140px -->
+  <rect x="94" y="28"  width="4"   height="4" fill="#d6409f"/>
+  <rect x="90" y="32"  width="12"  height="4" fill="#d6409f"/>
+  <rect x="86" y="36"  width="20"  height="4" fill="#d6409f"/>
+  <rect x="82" y="40"  width="28"  height="4" fill="#d6409f"/>
+  <rect x="78" y="44"  width="36"  height="4" fill="#d6409f"/>
+  <rect x="74" y="48"  width="44"  height="4" fill="#d6409f"/>
+  <rect x="70" y="52"  width="52"  height="4" fill="#d6409f"/>
+  <rect x="66" y="56"  width="60"  height="4" fill="#d6409f"/>
+  <rect x="62" y="60"  width="68"  height="4" fill="#d6409f"/>
+  <rect x="58" y="64"  width="76"  height="4" fill="#d6409f"/>
+  <rect x="54" y="68"  width="84"  height="4" fill="#d6409f"/>
+  <rect x="50" y="72"  width="92"  height="4" fill="#d6409f"/>
+  <rect x="46" y="76"  width="100" height="4" fill="#d6409f"/>
+  <rect x="42" y="80"  width="108" height="4" fill="#d6409f"/>
+  <rect x="38" y="84"  width="116" height="4" fill="#d6409f"/>
+  <rect x="34" y="88"  width="124" height="4" fill="#d6409f"/>
+  <rect x="30" y="92"  width="132" height="4" fill="#d6409f"/>
+  <rect x="26" y="96"  width="140" height="4" fill="#d6409f"/>
+  <rect x="30" y="100" width="132" height="4" fill="#d6409f"/>
+  <rect x="34" y="104" width="124" height="4" fill="#d6409f"/>
+  <rect x="38" y="108" width="116" height="4" fill="#d6409f"/>
+  <rect x="42" y="112" width="108" height="4" fill="#d6409f"/>
+  <rect x="46" y="116" width="100" height="4" fill="#d6409f"/>
+  <rect x="50" y="120" width="92"  height="4" fill="#d6409f"/>
+  <rect x="54" y="124" width="84"  height="4" fill="#d6409f"/>
+  <rect x="58" y="128" width="76"  height="4" fill="#d6409f"/>
+  <rect x="62" y="132" width="68"  height="4" fill="#d6409f"/>
+  <rect x="66" y="136" width="60"  height="4" fill="#d6409f"/>
+  <rect x="70" y="140" width="52"  height="4" fill="#d6409f"/>
+  <rect x="74" y="144" width="44"  height="4" fill="#d6409f"/>
+  <rect x="78" y="148" width="36"  height="4" fill="#d6409f"/>
+  <rect x="82" y="152" width="28"  height="4" fill="#d6409f"/>
+  <rect x="86" y="156" width="20"  height="4" fill="#d6409f"/>
+  <rect x="90" y="160" width="12"  height="4" fill="#d6409f"/>
+  <rect x="94" y="164" width="4"   height="4" fill="#d6409f"/>
+
+  <!-- Outer dark diamond — 4px inset from rose ring -->
+  <rect x="94" y="32"  width="4"   height="4" fill="#c2298a"/>
+  <rect x="90" y="36"  width="12"  height="4" fill="#c2298a"/>
+  <rect x="86" y="40"  width="20"  height="4" fill="#c2298a"/>
+  <rect x="82" y="44"  width="28"  height="4" fill="#c2298a"/>
+  <rect x="78" y="48"  width="36"  height="4" fill="#c2298a"/>
+  <rect x="74" y="52"  width="44"  height="4" fill="#c2298a"/>
+  <rect x="70" y="56"  width="52"  height="4" fill="#c2298a"/>
+  <rect x="66" y="60"  width="60"  height="4" fill="#c2298a"/>
+  <rect x="62" y="64"  width="68"  height="4" fill="#c2298a"/>
+  <rect x="58" y="68"  width="76"  height="4" fill="#c2298a"/>
+  <rect x="54" y="72"  width="84"  height="4" fill="#c2298a"/>
+  <rect x="50" y="76"  width="92"  height="4" fill="#c2298a"/>
+  <rect x="46" y="80"  width="100" height="4" fill="#c2298a"/>
+  <rect x="42" y="84"  width="108" height="4" fill="#c2298a"/>
+  <rect x="38" y="88"  width="116" height="4" fill="#c2298a"/>
+  <rect x="34" y="92"  width="124" height="4" fill="#c2298a"/>
+  <rect x="30" y="96"  width="132" height="4" fill="#c2298a"/>
+  <rect x="34" y="100" width="124" height="4" fill="#c2298a"/>
+  <rect x="38" y="104" width="116" height="4" fill="#c2298a"/>
+  <rect x="42" y="108" width="108" height="4" fill="#c2298a"/>
+  <rect x="46" y="112" width="100" height="4" fill="#c2298a"/>
+  <rect x="50" y="116" width="92"  height="4" fill="#c2298a"/>
+  <rect x="54" y="120" width="84"  height="4" fill="#c2298a"/>
+  <rect x="58" y="124" width="76"  height="4" fill="#c2298a"/>
+  <rect x="62" y="128" width="68"  height="4" fill="#c2298a"/>
+  <rect x="66" y="132" width="60"  height="4" fill="#c2298a"/>
+  <rect x="70" y="136" width="52"  height="4" fill="#c2298a"/>
+  <rect x="74" y="140" width="44"  height="4" fill="#c2298a"/>
+  <rect x="78" y="144" width="36"  height="4" fill="#c2298a"/>
+  <rect x="82" y="148" width="28"  height="4" fill="#c2298a"/>
+  <rect x="86" y="152" width="20"  height="4" fill="#c2298a"/>
+  <rect x="90" y="156" width="12"  height="4" fill="#c2298a"/>
+  <rect x="94" y="160" width="4"   height="4" fill="#c2298a"/>
+
+  <!-- Inner lighter diamond — 12px inset from rose ring -->
+  <rect x="94" y="40"  width="4"   height="4" fill="#f9d8ed"/>
+  <rect x="90" y="44"  width="12"  height="4" fill="#f9d8ed"/>
+  <rect x="86" y="48"  width="20"  height="4" fill="#f9d8ed"/>
+  <rect x="82" y="52"  width="28"  height="4" fill="#f9d8ed"/>
+  <rect x="78" y="56"  width="36"  height="4" fill="#f9d8ed"/>
+  <rect x="74" y="60"  width="44"  height="4" fill="#f9d8ed"/>
+  <rect x="70" y="64"  width="52"  height="4" fill="#f9d8ed"/>
+  <rect x="66" y="68"  width="60"  height="4" fill="#f9d8ed"/>
+  <rect x="62" y="72"  width="68"  height="4" fill="#f9d8ed"/>
+  <rect x="58" y="76"  width="76"  height="4" fill="#f9d8ed"/>
+  <rect x="54" y="80"  width="84"  height="4" fill="#f9d8ed"/>
+  <rect x="50" y="84"  width="92"  height="4" fill="#f9d8ed"/>
+  <rect x="46" y="88"  width="100" height="4" fill="#f9d8ed"/>
+  <rect x="42" y="92"  width="108" height="4" fill="#f9d8ed"/>
+  <rect x="38" y="96"  width="116" height="4" fill="#f9d8ed"/>
+  <rect x="42" y="100" width="108" height="4" fill="#f9d8ed"/>
+  <rect x="46" y="104" width="100" height="4" fill="#f9d8ed"/>
+  <rect x="50" y="108" width="92"  height="4" fill="#f9d8ed"/>
+  <rect x="54" y="112" width="84"  height="4" fill="#f9d8ed"/>
+  <rect x="58" y="116" width="76"  height="4" fill="#f9d8ed"/>
+  <rect x="62" y="120" width="68"  height="4" fill="#f9d8ed"/>
+  <rect x="66" y="124" width="60"  height="4" fill="#f9d8ed"/>
+  <rect x="70" y="128" width="52"  height="4" fill="#f9d8ed"/>
+  <rect x="74" y="132" width="44"  height="4" fill="#f9d8ed"/>
+  <rect x="78" y="136" width="36"  height="4" fill="#f9d8ed"/>
+  <rect x="82" y="140" width="28"  height="4" fill="#f9d8ed"/>
+  <rect x="86" y="144" width="20"  height="4" fill="#f9d8ed"/>
+  <rect x="90" y="148" width="12"  height="4" fill="#f9d8ed"/>
+  <rect x="94" y="152" width="4"   height="4" fill="#f9d8ed"/>
+
+  <!-- Quadrant accent diamonds -->
+  <rect x="36"  y="32"  width="4"  height="4" fill="#d6409f"/>
+  <rect x="32"  y="36"  width="12" height="4" fill="#d6409f"/>
+  <rect x="36"  y="40"  width="4"  height="4" fill="#d6409f"/>
+  <rect x="152" y="32"  width="4"  height="4" fill="#d6409f"/>
+  <rect x="148" y="36"  width="12" height="4" fill="#d6409f"/>
+  <rect x="152" y="40"  width="4"  height="4" fill="#d6409f"/>
+  <rect x="36"  y="152" width="4"  height="4" fill="#d6409f"/>
+  <rect x="32"  y="156" width="12" height="4" fill="#d6409f"/>
+  <rect x="36"  y="160" width="4"  height="4" fill="#d6409f"/>
+  <rect x="152" y="152" width="4"  height="4" fill="#d6409f"/>
+  <rect x="148" y="156" width="12" height="4" fill="#d6409f"/>
+  <rect x="152" y="160" width="4"  height="4" fill="#d6409f"/>
+
+  <!-- Center medallion -->
+  <rect x="94" y="88"  width="4"  height="4" fill="#c2298a"/>
+  <rect x="90" y="92"  width="12" height="4" fill="#c2298a"/>
+  <rect x="86" y="96"  width="20" height="4" fill="#c2298a"/>
+  <rect x="90" y="100" width="12" height="4" fill="#c2298a"/>
+  <rect x="94" y="104" width="4"  height="4" fill="#c2298a"/>
+
+  <!-- Center highlight -->
+  <rect x="94" y="96" width="4" height="4" fill="#feeef8"/>
+</svg>

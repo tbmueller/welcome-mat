@@ -11,7 +11,7 @@ export const metadata: Metadata = {
   title: "WelcomeMat",
   description: "Track your guests' flights",
   verification: {
-    google: "LmJYkYRdAYhuB01a-n1rLmUSWrF_sITwutRH28UirEI",
+    google: ["LmJYkYRdAYhuB01a-n1rLmUSWrF_sITwutRH28UirEI", "grzgpl2kmsXM_L0JWLb07T49E1XV237rDqYH0Lb7SnU"],
   },
 };
 
