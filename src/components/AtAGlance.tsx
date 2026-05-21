@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { format, parseISO } from "date-fns";
+import { Button, Select } from "@radix-ui/themes";
 import type { FlightWithPassengers, SavedAddress } from "@/types";
 
 type ExtendedFlight = FlightWithPassengers & { directionsUrl?: string };
@@ -65,13 +66,12 @@ export function AtAGlance({ flights, trip, savedAddresses, onOriginChange, onRef
     const origin = origins.find((o) => o.id === id);
     if (!origin) return;
     if (id === "trip") {
-      onOriginChange(null, null); // revert to trip default
+      onOriginChange(null, null);
     } else {
       onOriginChange(origin.latLng, origin.address);
     }
   }
 
-  // Sort upcoming flights by their relevant time; exclude arrived/cancelled
   const upcoming = flights
     .filter((f) => f.status !== "arrived" && f.status !== "cancelled")
     .map((f) => {
@@ -86,7 +86,7 @@ export function AtAGlance({ flights, trip, savedAddresses, onOriginChange, onRef
           : !!(f.estimatedDeparture && f.scheduledDeparture && new Date(f.estimatedDeparture) > new Date(f.scheduledDeparture));
       return { flight: f, relevantTime, ms, isDelayed };
     })
-    .filter((x) => x.ms === null || x.ms > -60 * 60_000) // hide flights that happened > 1h ago
+    .filter((x) => x.ms === null || x.ms > -60 * 60_000)
     .sort((a, b) => {
       if (!a.relevantTime) return 1;
       if (!b.relevantTime) return -1;
@@ -98,49 +98,35 @@ export function AtAGlance({ flights, trip, savedAddresses, onOriginChange, onRef
   if (upcoming.length === 0) return null;
 
   return (
-    <div className="mb-6 rounded-xl border border-pink-200 bg-pink-50 p-4 dark:border-pink-900 dark:bg-pink-950/30">
-      {/* Header */}
+    <div className="mb-6 rounded-xl border border-[var(--accent-6)] bg-[var(--accent-2)] p-4">
       <div className="mb-3 flex items-center justify-between">
-        <h2 className="text-sm font-semibold text-pink-900 dark:text-pink-200">At a glance</h2>
-        <button
-          onClick={onRefresh}
-          disabled={refreshing}
-          className="text-xs text-pink-900 hover:underline disabled:opacity-50 dark:text-pink-400"
-        >
+        <h2 className="text-sm font-semibold text-[var(--accent-12)]">At a glance</h2>
+        <Button variant="ghost" size="1" onClick={onRefresh} disabled={refreshing}>
           {refreshing ? "Refreshing…" : "Refresh"}
-        </button>
+        </Button>
       </div>
 
-      {/* Address picker */}
       <div className="mb-4 flex items-center gap-2">
-        <span className="text-xs text-pink-900 dark:text-pink-400 whitespace-nowrap">Departing from</span>
-        <select
-          value={selectedOriginId}
-          onChange={(e) => handleOriginChange(e.target.value)}
-          className="min-w-0 flex-1 rounded-lg border border-pink-400 bg-white px-2 py-1 text-xs focus:outline-none focus:ring-2 focus:ring-pink-900 dark:border-pink-900 dark:bg-taupe-800 dark:text-taupe-100"
-        >
-          {origins.map((o) => (
-            <option key={o.id} value={o.id}>
-              {o.label}
-            </option>
-          ))}
-        </select>
+        <span className="text-xs text-[var(--accent-11)] whitespace-nowrap">Departing from</span>
+        <Select.Root value={selectedOriginId} onValueChange={handleOriginChange}>
+          <Select.Trigger className="min-w-0 flex-1" />
+          <Select.Content>
+            {origins.map((o) => (
+              <Select.Item key={o.id} value={o.id}>{o.label}</Select.Item>
+            ))}
+          </Select.Content>
+        </Select.Root>
       </div>
 
-      {/* Delay banner */}
       {delayedCount > 0 && (
         <div className="mb-3 rounded-lg bg-amber-100 px-3 py-2 text-xs font-medium text-amber-800 dark:bg-amber-900/40 dark:text-amber-300">
           ⚠ {delayedCount} flight{delayedCount > 1 ? "s" : ""} delayed
         </div>
       )}
 
-      {/* Flight rows */}
       <ul className="space-y-2">
         {upcoming.map(({ flight: f, ms, isDelayed }) => (
-          <li
-            key={f.id}
-            className="flex flex-col gap-1 rounded-lg bg-white px-3 py-2.5 shadow-sm dark:bg-taupe-800"
-          >
+          <li key={f.id} className="flex flex-col gap-1 rounded-lg bg-white px-3 py-2.5 shadow-sm dark:bg-taupe-800">
             <div className="flex items-center justify-between gap-2 flex-wrap">
               <div className="flex items-center gap-2">
                 <span className="font-mono font-semibold text-sm">{f.flightNumber}</span>
@@ -154,13 +140,12 @@ export function AtAGlance({ flights, trip, savedAddresses, onOriginChange, onRef
                 )}
               </div>
               {ms !== null && (
-                <span className={`text-xs font-medium tabular-nums ${ms < 0 ? "text-taupe-400 dark:text-taupe-500" : "text-pink-900 dark:text-pink-400"}`}>
+                <span className={`text-xs font-medium tabular-nums ${ms < 0 ? "text-taupe-400 dark:text-taupe-500" : "text-[var(--accent-11)]"}`}>
                   {ms < 0 ? `${formatCountdown(-ms)} ago` : `in ${formatCountdown(ms)}`}
                 </span>
               )}
             </div>
 
-            {/* Leave-by row */}
             <div className="flex items-center justify-between gap-2 text-xs">
               <div className="flex items-center gap-2 text-taupe-500 dark:text-taupe-400">
                 {f.leaveBy ? (
@@ -173,12 +158,7 @@ export function AtAGlance({ flights, trip, savedAddresses, onOriginChange, onRef
                 )}
               </div>
               {f.directionsUrl && (
-                <a
-                  href={f.directionsUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="shrink-0 text-pink-900 hover:underline dark:text-pink-400"
-                >
+                <a href={f.directionsUrl} target="_blank" rel="noopener noreferrer" className="shrink-0 text-[var(--accent-11)] hover:underline">
                   Directions ↗
                 </a>
               )}

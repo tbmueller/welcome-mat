@@ -1,3 +1,4 @@
+@import "@radix-ui/themes/styles.css";
 @import "tailwindcss";
 
 :root {
@@ -26,6 +27,7 @@ body {
   font-family: Arial, Helvetica, sans-serif;
 }
 
-button, [role="button"] {
+/* Radix Themes Button already sets cursor:pointer; extend to other interactive elements */
+a, button, [role="button"] {
   cursor: pointer;
 }

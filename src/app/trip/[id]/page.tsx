@@ -3,6 +3,8 @@
 import { useEffect, useState, useCallback } from "react";
 import { useParams, useRouter } from "next/navigation";
 import Link from "next/link";
+import { Button } from "@radix-ui/themes";
+import { GearIcon, PaperPlaneIcon } from "@radix-ui/react-icons";
 import { useAuth } from "@/hooks/useAuth";
 import { api } from "@/lib/apiClient";
 import { db } from "@/lib/firebase";
@@ -110,7 +112,7 @@ export default function TripPage() {
   if (loading || fetching) {
     return (
       <div className="flex min-h-screen items-center justify-center">
-        <div className="h-8 w-8 animate-spin rounded-full border-4 border-pink-900 border-t-transparent" />
+        <div className="h-8 w-8 animate-spin rounded-full border-4 border-[var(--accent-9)] border-t-transparent" />
       </div>
     );
   }
@@ -138,18 +140,13 @@ export default function TripPage() {
         </div>
         {isHost && (
           <div className="flex items-center gap-2">
-            <button
-              onClick={() => setShowInvite(true)}
-              className="rounded-lg bg-pink-900 px-4 py-2 text-sm font-medium text-white transition hover:bg-pink-900/70 active:bg-pink-950"
-            >
-              Invite guests
-            </button>
-            <Link
-              href={`/trip/${tripId}/settings`}
-              className="rounded-lg border border-taupe-300 px-3 py-2 text-sm font-medium text-taupe-600 transition hover:bg-taupe-50 dark:border-taupe-600 dark:text-taupe-300 dark:hover:bg-taupe-700"
-            >
-              Trip settings
-            </Link>
+            <Button onClick={() => setShowInvite(true)}>Invite guests</Button>
+            <Button asChild variant="outline" color="gray">
+              <Link href={`/trip/${tripId}/settings`}>
+                <GearIcon />
+                Trip settings
+              </Link>
+            </Button>
           </div>
         )}
       </div>
@@ -185,7 +182,9 @@ export default function TripPage() {
                   flight={f}
                   isHost={isHost}
                   currentUserUid={user!.uid}
+                  allMembers={members}
                   onRemoved={() => refreshTravelTimes()}
+                  onPassengersChanged={() => refreshTravelTimes()}
                 />
               ))}
           </ul>
@@ -212,7 +211,9 @@ export default function TripPage() {
                   flight={f}
                   isHost={isHost}
                   currentUserUid={user!.uid}
+                  allMembers={members}
                   onRemoved={() => refreshTravelTimes()}
+                  onPassengersChanged={() => refreshTravelTimes()}
                 />
               ))}
           </ul>
@@ -221,7 +222,7 @@ export default function TripPage() {
 
       <button
         onClick={() => setShowAddFlight(true)}
-        className="w-full rounded-lg border-2 border-dashed border-taupe-300 py-3 text-sm text-taupe-500 transition hover:border-pink-400 hover:text-pink-900 dark:border-taupe-600 dark:text-taupe-400 dark:hover:border-pink-900 dark:hover:text-pink-400"
+        className="w-full rounded-lg border-2 border-dashed border-taupe-300 py-3 text-sm text-taupe-500 transition hover:border-[var(--accent-9)] hover:text-[var(--accent-11)] dark:border-taupe-600 dark:text-taupe-400"
       >
         {isHost ? "+ Add a guest's flight" : "+ Add my flight"}
       </button>

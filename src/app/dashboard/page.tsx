@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import { Button } from "@radix-ui/themes";
 import { useAuth } from "@/hooks/useAuth";
 import { api } from "@/lib/apiClient";
 import type { Trip, GuestMergedNotification } from "@/types";
@@ -40,7 +41,7 @@ export default function DashboardPage() {
   if (loading || fetching) {
     return (
       <div className="flex min-h-screen items-center justify-center">
-        <div className="h-8 w-8 animate-spin rounded-full border-4 border-pink-900 border-t-transparent" />
+        <div className="h-8 w-8 animate-spin rounded-full border-4 border-[var(--accent-9)] border-t-transparent" />
       </div>
     );
   }
@@ -50,8 +51,8 @@ export default function DashboardPage() {
       {notifications.length > 0 && (
         <ul className="mb-6 space-y-2">
           {notifications.map((n) => (
-            <li key={n.id} className="flex items-start justify-between gap-3 rounded-xl border border-pink-200 bg-pink-50 px-4 py-3 text-sm dark:border-pink-900 dark:bg-pink-950">
-              <p className="text-pink-900 dark:text-pink-100">
+            <li key={n.id} className="flex items-start justify-between gap-3 rounded-xl border border-[var(--accent-6)] bg-[var(--accent-2)] px-4 py-3 text-sm">
+              <p className="text-[var(--accent-12)]">
                 <span className="font-semibold">{n.realDisplayName}</span> joined your trip{" "}
                 <Link href={`/trip/${n.tripId}`} className="underline hover:no-underline">
                   {n.tripName}
@@ -59,13 +60,9 @@ export default function DashboardPage() {
                 via invite and was matched to the manual guest you added as{" "}
                 <span className="font-semibold">{n.manualDisplayName}</span>. Their flights have been transferred.
               </p>
-              <button
-                onClick={() => dismissNotification(n.id)}
-                className="mt-0.5 shrink-0 text-pink-400 hover:text-pink-900 dark:text-pink-900 dark:hover:text-pink-400"
-                aria-label="Dismiss"
-              >
+              <Button variant="ghost" size="1" onClick={() => dismissNotification(n.id)} aria-label="Dismiss" className="mt-0.5 shrink-0">
                 ✕
-              </button>
+              </Button>
             </li>
           ))}
         </ul>
@@ -73,22 +70,11 @@ export default function DashboardPage() {
 
       <div className="mb-8 flex items-center justify-between">
         <h1 className="text-2xl font-bold">My Trips</h1>
-        <div className="flex items-center gap-3">
-          <Link href="/profile" className="text-sm text-taupe-500 hover:text-taupe-800 dark:text-taupe-400 dark:hover:text-taupe-200">
-            Profile
-          </Link>
-          <button
-            onClick={signOut}
-            className="text-sm text-pink-900 hover:text-pink-900/60 active:text-pink-950 dark:text-pink-400 dark:hover:text-pink-400/60 dark:active:text-pink-200"
-          >
-            Sign out
-          </button>
-        </div>
       </div>
 
       <button
         onClick={() => setShowCreate(true)}
-        className="mb-6 w-full rounded-lg border-2 border-dashed border-taupe-300 py-4 text-sm text-taupe-500 transition hover:border-pink-400 hover:text-pink-900 dark:border-taupe-600 dark:text-taupe-400 dark:hover:border-pink-900 dark:hover:text-pink-400"
+        className="mb-6 w-full rounded-lg border-2 border-dashed border-taupe-300 py-4 text-sm text-taupe-500 transition hover:border-[var(--accent-9)] hover:text-[var(--accent-11)] dark:border-taupe-600 dark:text-taupe-400"
       >
         + New trip
       </button>

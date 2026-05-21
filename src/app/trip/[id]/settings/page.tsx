@@ -3,6 +3,8 @@
 import { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import Link from "next/link";
+import { Button, Select, TextField, IconButton } from "@radix-ui/themes";
+import { ArrowLeftIcon, Cross2Icon, TrashIcon } from "@radix-ui/react-icons";
 import { useAuth } from "@/hooks/useAuth";
 import { api } from "@/lib/apiClient";
 import type { Trip, Membership, SavedAddress } from "@/types";
@@ -33,7 +35,6 @@ export default function TripSettingsPage() {
   const [newGuestName, setNewGuestName] = useState("");
   const [addingGuest, setAddingGuest] = useState(false);
 
-  // Edit fields
   const [name, setName] = useState("");
   const [airport, setAirport] = useState("");
   const [baseAddress, setBaseAddress] = useState("");
@@ -67,7 +68,6 @@ export default function TripSettingsPage() {
     if (user) load();
   }, [user, tripId]);
 
-  // Verify caller is host after load
   const isHost = members.find((m) => m.userUid === user?.uid)?.role === "host";
 
   useEffect(() => {
@@ -111,14 +111,10 @@ export default function TripSettingsPage() {
 
   async function handleRemoveMember(uid: string, displayName: string) {
     if (!confirm(`Remove ${displayName} from this trip?`)) return;
-    // DELETE with a body — fetch directly since api.delete doesn't take a body
     const token = await getIdToken();
     await fetch(`/api/trips/${tripId}/members`, {
       method: "DELETE",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`,
-      },
+      headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
       body: JSON.stringify({ userUid: uid }),
     });
     load();
@@ -142,40 +138,40 @@ export default function TripSettingsPage() {
   if (loading || fetching) {
     return (
       <div className="flex min-h-screen items-center justify-center">
-        <div className="h-8 w-8 animate-spin rounded-full border-4 border-pink-900 border-t-transparent" />
+        <div className="h-8 w-8 animate-spin rounded-full border-4 border-[var(--accent-9)] border-t-transparent" />
       </div>
     );
   }
 
   if (!trip) return null;
 
-  const inputCls = "w-full rounded-lg border border-taupe-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-pink-900 dark:border-taupe-600 dark:bg-taupe-700 dark:text-taupe-100 dark:placeholder-taupe-400";
+  const inputCls = "w-full rounded-lg border border-taupe-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[var(--accent-9)] dark:border-taupe-600 dark:bg-taupe-700 dark:text-taupe-100 dark:placeholder-taupe-400";
 
   return (
     <div className="mx-auto max-w-lg px-4 py-8">
-      <div className="mb-4 flex items-center gap-2 text-sm text-taupe-400 dark:text-taupe-500">
-        <Link href="/dashboard" className="hover:text-taupe-700 dark:hover:text-taupe-300">Trips</Link>
-        <span>›</span>
-        <Link href={`/trip/${tripId}`} className="hover:text-taupe-700 dark:hover:text-taupe-300">{trip.name}</Link>
-        <span>›</span>
-        <span>Settings</span>
+      <div className="mb-4 flex items-center gap-3">
+        <IconButton asChild variant="ghost" color="gray" size="2">
+          <Link href={`/trip/${tripId}`} aria-label="Back to trip">
+            <ArrowLeftIcon width="18" height="18" />
+          </Link>
+        </IconButton>
+        <div className="flex items-center gap-2 text-sm text-taupe-400 dark:text-taupe-500">
+          <Link href="/dashboard" className="hover:text-taupe-700 dark:hover:text-taupe-300">Trips</Link>
+          <span>›</span>
+          <Link href={`/trip/${tripId}`} className="hover:text-taupe-700 dark:hover:text-taupe-300">{trip.name}</Link>
+          <span>›</span>
+          <span>Settings</span>
+        </div>
       </div>
 
       <h1 className="mb-6 text-2xl font-bold">Trip settings</h1>
 
-      {/* Edit form */}
       <form onSubmit={handleSave} className="mb-8 space-y-4 rounded-xl border border-taupe-200 bg-white p-5 shadow-sm dark:border-taupe-700 dark:bg-taupe-800">
         <h2 className="font-semibold text-taupe-700 dark:text-taupe-300">Details</h2>
 
         <div>
           <label className="mb-1 block text-sm font-medium text-taupe-700 dark:text-taupe-300">Name</label>
-          <input
-            type="text"
-            value={name}
-            onChange={(e) => setName(e.target.value)}
-            className={inputCls}
-            required
-          />
+          <TextField.Root value={name} onChange={(e) => setName(e.target.value)} required />
         </div>
 
         <div>
@@ -190,21 +186,19 @@ export default function TripSettingsPage() {
 
         <div>
           <label className="mb-1 block text-sm font-medium text-taupe-700 dark:text-taupe-300">Trip base</label>
-
           {savedAddresses.length > 0 && (
-            <select
-              value={selectedAddressId}
-              onChange={(e) => handleAddressSelect(e.target.value)}
-              className={`mb-2 ${inputCls}`}
-            >
-              <option value="current">Keep current</option>
-              {savedAddresses.map((a) => (
-                <option key={a.id} value={a.id}>
-                  {a.label}{a.isDefault ? " (default)" : ""}
-                </option>
-              ))}
-              <option value="new">Enter a new address…</option>
-            </select>
+            <Select.Root value={selectedAddressId} onValueChange={handleAddressSelect}>
+              <Select.Trigger className="mb-2 w-full" />
+              <Select.Content>
+                <Select.Item value="current">Keep current</Select.Item>
+                {savedAddresses.map((a) => (
+                  <Select.Item key={a.id} value={a.id}>
+                    {a.label}{a.isDefault ? " (default)" : ""}
+                  </Select.Item>
+                ))}
+                <Select.Item value="new">Enter a new address…</Select.Item>
+              </Select.Content>
+            </Select.Root>
           )}
 
           {(selectedAddressId === "new" || savedAddresses.length === 0) && (
@@ -225,90 +219,58 @@ export default function TripSettingsPage() {
 
         {error && <p className="text-sm text-red-500 dark:text-red-400">{error}</p>}
 
-        <button
-          type="submit"
-          disabled={saving}
-          className="w-full rounded-lg bg-pink-900 py-2 text-sm font-medium text-white transition hover:bg-pink-900/70 active:bg-pink-950 disabled:opacity-50"
-        >
+        <Button type="submit" disabled={saving} className="w-full">
           {saving ? "Saving…" : "Save changes"}
-        </button>
+        </Button>
       </form>
 
-      {/* Members */}
       <div className="mb-8 rounded-xl border border-taupe-200 bg-white p-5 shadow-sm dark:border-taupe-700 dark:bg-taupe-800">
         <div className="mb-3 flex items-center justify-between">
           <h2 className="font-semibold text-taupe-700 dark:text-taupe-300">Guests</h2>
-          <button
-            onClick={() => setShowInvite(true)}
-            className="text-xs font-medium text-pink-900 hover:underline dark:text-pink-400"
-          >
-            + Invite
-          </button>
+          <Button variant="ghost" size="1" onClick={() => setShowInvite(true)}>+ Invite</Button>
         </div>
         {members.filter((m) => m.role === "guest").length === 0 ? (
           <p className="text-sm text-taupe-400 dark:text-taupe-500">No guests yet.</p>
         ) : (
           <ul className="space-y-2">
-            {members
-              .filter((m) => m.role === "guest")
-              .map((m) => (
-                <li key={m.userUid} className="flex items-center justify-between">
-                  <div className="flex items-center gap-2">
-                    {m.photoURL && (
-                      // eslint-disable-next-line @next/next/no-img-element
-                      <img
-                        src={m.photoURL}
-                        alt={m.displayName}
-                        className="h-7 w-7 rounded-full object-cover"
-                      />
-                    )}
-                    <span className="text-sm">{m.displayName}</span>
-                  </div>
-                  <button
-                    onClick={() => handleRemoveMember(m.userUid, m.displayName)}
-                    className="text-xs text-red-500 hover:underline dark:text-red-400"
-                  >
-                    Remove
-                  </button>
-                </li>
-              ))}
+            {members.filter((m) => m.role === "guest").map((m) => (
+              <li key={m.userUid} className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  {m.photoURL && (
+                    // eslint-disable-next-line @next/next/no-img-element
+                    <img src={m.photoURL} alt={m.displayName} className="h-7 w-7 rounded-full object-cover" />
+                  )}
+                  <span className="text-sm">{m.displayName}</span>
+                </div>
+                <Button variant="ghost" color="red" size="1" onClick={() => handleRemoveMember(m.userUid, m.displayName)}>
+                  <Cross2Icon width={14} height={14} /> Remove
+                </Button>
+              </li>
+            ))}
           </ul>
         )}
 
         <form onSubmit={handleAddGuest} className="mt-4 flex gap-2">
-          <input
-            type="text"
+          <TextField.Root
             value={newGuestName}
             onChange={(e) => setNewGuestName(e.target.value)}
             placeholder="Add guest by name…"
-            className="min-w-0 flex-1 rounded-lg border border-taupe-300 px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-pink-900 dark:border-taupe-600 dark:bg-taupe-700 dark:text-taupe-100 dark:placeholder-taupe-400"
+            className="min-w-0 flex-1"
           />
-          <button
-            type="submit"
-            disabled={addingGuest || !newGuestName.trim()}
-            className="rounded-lg bg-pink-900 px-3 py-1.5 text-sm font-medium text-white transition hover:bg-pink-900/70 active:bg-pink-950 disabled:opacity-50"
-          >
-            Add
-          </button>
+          <Button type="submit" disabled={addingGuest || !newGuestName.trim()}>Add</Button>
         </form>
       </div>
 
-      {showInvite && (
-        <InviteModal tripId={tripId} onClose={() => setShowInvite(false)} />
-      )}
+      {showInvite && <InviteModal tripId={tripId} onClose={() => setShowInvite(false)} />}
 
-      {/* Danger zone */}
       <div className="rounded-xl border border-red-200 bg-white p-5 dark:border-red-900 dark:bg-taupe-800">
         <h2 className="mb-2 font-semibold text-red-700 dark:text-red-400">Danger zone</h2>
         <p className="mb-3 text-sm text-taupe-500 dark:text-taupe-400">
           Permanently deletes this trip and all guest data. Cannot be undone.
         </p>
-        <button
-          onClick={handleDeleteTrip}
-          className="rounded-lg border border-red-300 px-4 py-2 text-sm font-medium text-red-600 transition hover:bg-red-50 dark:border-red-700 dark:text-red-400 dark:hover:bg-red-900/30"
-        >
-          Delete trip
-        </button>
+        <Button variant="outline" color="red" onClick={handleDeleteTrip}>
+          <TrashIcon /> Delete trip
+        </Button>
       </div>
     </div>
   );

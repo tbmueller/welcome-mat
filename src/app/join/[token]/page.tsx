@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
+import { Button } from "@radix-ui/themes";
 import { useAuth } from "@/hooks/useAuth";
 import { api } from "@/lib/apiClient";
 
@@ -28,7 +29,7 @@ export default function JoinPage() {
   if (loading) {
     return (
       <div className="flex min-h-screen items-center justify-center">
-        <div className="h-8 w-8 animate-spin rounded-full border-4 border-pink-900 border-t-transparent" />
+        <div className="h-8 w-8 animate-spin rounded-full border-4 border-[var(--accent-9)] border-t-transparent" />
       </div>
     );
   }
@@ -39,12 +40,9 @@ export default function JoinPage() {
         <p className="text-center text-taupe-600 dark:text-taupe-400">
           Sign in with Google to accept your invitation.
         </p>
-        <button
-          onClick={signIn}
-          className="flex items-center gap-3 rounded-lg border border-taupe-300 bg-white px-6 py-3 text-sm font-medium shadow-sm transition hover:bg-taupe-50 dark:border-taupe-600 dark:bg-taupe-800 dark:text-taupe-100 dark:hover:bg-taupe-700"
-        >
+        <Button variant="outline" color="gray" size="3" onClick={signIn}>
           Sign in with Google
-        </button>
+        </Button>
       </div>
     );
   }
@@ -53,19 +51,16 @@ export default function JoinPage() {
     return (
       <div className="flex min-h-screen flex-col items-center justify-center gap-4 px-4">
         <p className="text-red-600 dark:text-red-400">{errorMsg}</p>
-        <button
-          onClick={() => router.push("/dashboard")}
-          className="text-sm text-pink-900 hover:underline dark:text-pink-400"
-        >
+        <Button variant="ghost" onClick={() => router.push("/dashboard")}>
           Go to dashboard
-        </button>
+        </Button>
       </div>
     );
   }
 
   return (
     <div className="flex min-h-screen items-center justify-center">
-      <div className="h-8 w-8 animate-spin rounded-full border-4 border-pink-900 border-t-transparent" />
+      <div className="h-8 w-8 animate-spin rounded-full border-4 border-[var(--accent-9)] border-t-transparent" />
     </div>
   );
 }

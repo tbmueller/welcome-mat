@@ -1,6 +1,6 @@
 "use client";
 
-import { createContext, useEffect, useState, ReactNode } from "react";
+import { createContext, useCallback, useEffect, useMemo, useState, ReactNode } from "react";
 import {
   onAuthStateChanged,
   signInWithPopup,
@@ -68,23 +68,26 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     return unsub;
   }, []);
 
-  async function signIn() {
+  const signIn = useCallback(async () => {
     await signInWithPopup(auth, googleProvider);
-  }
+  }, []);
 
-  async function signOut() {
+  const signOut = useCallback(async () => {
     await firebaseSignOut(auth);
-  }
+  }, []);
 
-  async function getIdToken(): Promise<string> {
+  const getIdToken = useCallback(async (): Promise<string> => {
     if (!firebaseUser) throw new Error("Not authenticated");
     return firebaseUser.getIdToken();
-  }
+  }, [firebaseUser]);
+
+  const value = useMemo(
+    () => ({ user, firebaseUser, loading, signIn, signOut, getIdToken }),
+    [user, firebaseUser, loading, signIn, signOut, getIdToken]
+  );
 
   return (
-    <AuthContext.Provider
-      value={{ user, firebaseUser, loading, signIn, signOut, getIdToken }}
-    >
+    <AuthContext.Provider value={value}>
       {children}
     </AuthContext.Provider>
   );
