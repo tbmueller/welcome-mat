@@ -1,14 +1,12 @@
 import type { CapacitorConfig } from "@capacitor/cli";
 
 const config: CapacitorConfig = {
-  appId: "com.triptracker.app",
-  appName: "Trip Tracker",
-  // Points to the Next.js static export during development.
-  // In CI, swap to the deployed URL so the native shell loads the live app.
-  webDir: "out",
+  appId: "app.welcomemat",
+  appName: "WelcomeMat",
+  webDir: "public",
   server: {
-    // Only your own domain is allowed — no wildcard navigation
-    allowNavigation: [],
+    url: "https://welcome-mat.app",
+    cleartext: false,
   },
   ios: {
     allowsLinkPreview: false,
