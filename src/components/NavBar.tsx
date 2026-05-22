@@ -45,6 +45,13 @@ export function NavBar() {
             <DropdownMenu.Separator />
             <ThemeColorPicker />
             <DropdownMenu.Separator />
+            <DropdownMenu.Item onSelect={() => router.push("/privacy")}>
+              Privacy Policy
+            </DropdownMenu.Item>
+            <DropdownMenu.Item onSelect={() => router.push("/terms")}>
+              Terms of Service
+            </DropdownMenu.Item>
+            <DropdownMenu.Separator />
             <DropdownMenu.Item color="red" onSelect={signOut}>
               Sign out
             </DropdownMenu.Item>
