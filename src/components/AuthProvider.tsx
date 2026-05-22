@@ -35,15 +35,25 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     // Process any pending redirect result (fires after signInWithRedirect returns)
     getRedirectResult(auth).catch(() => {});
 
-    const unsub = onAuthStateChanged(auth, async (fbUser) => {
+    const unsub = onAuthStateChanged(auth, (fbUser) => {
       if (fbUser) {
         setFirebaseUser(fbUser);
-        try {
-          const ref = doc(db, "users", fbUser.uid);
-          const snap = await getDoc(ref);
+        // Unblock the UI immediately using Auth data — no Firestore wait
+        setUser({
+          uid: fbUser.uid,
+          email: fbUser.email!,
+          displayName: fbUser.displayName ?? "Guest",
+          photoURL: fbUser.photoURL,
+          defaultAddressId: null, // filled in below, async
+        });
+        setSigningIn(false);
+        setLoading(false);
+
+        // Sync user doc and pick up defaultAddressId in the background
+        const ref = doc(db, "users", fbUser.uid);
+        getDoc(ref).then((snap) => {
           const stored = snap.data();
           if (!snap.exists() || !stored?.uid) {
-            // Doc missing or incomplete (e.g. created by a server merge with only defaultAddressId)
             const newUser: User = {
               uid: fbUser.uid,
               email: fbUser.email!,
@@ -51,27 +61,20 @@ export function AuthProvider({ children }: { children: ReactNode }) {
               photoURL: fbUser.photoURL,
               defaultAddressId: stored?.defaultAddressId ?? null,
             };
-            await setDoc(ref, { ...newUser, createdAt: serverTimestamp() }, { merge: true });
+            setDoc(ref, { ...newUser, createdAt: serverTimestamp() }, { merge: true });
             setUser(newUser);
           } else {
             setUser(stored as User);
           }
-        } catch {
-          // Firestore unavailable — build user from Auth data
-          setUser({
-            uid: fbUser.uid,
-            email: fbUser.email!,
-            displayName: fbUser.displayName ?? "Guest",
-            photoURL: fbUser.photoURL,
-            defaultAddressId: null,
-          });
-        }
+        }).catch(() => {
+          // Keep the Auth-derived user already set above
+        });
       } else {
         setFirebaseUser(null);
         setUser(null);
+        setSigningIn(false);
+        setLoading(false);
       }
-      setSigningIn(false);
-      setLoading(false);
     });
     return unsub;
   }, []);

@@ -41,16 +41,6 @@ export default function TripPage() {
     if (!loading && !user) router.replace("/");
   }, [user, loading, router]);
 
-  useEffect(() => {
-    if (!user) return;
-    api.get<{ trip: Trip }>(`/api/trips/${tripId}`).then(({ trip }) => {
-      setTrip(trip);
-      setFetching(false);
-    });
-  }, [user, tripId]);
-
-  const isHost = !!trip && trip.hostUid === user?.uid;
-
   const refreshMembers = useCallback(async () => {
     setMembersLoading(true);
     await api
@@ -60,11 +50,16 @@ export default function TripPage() {
       .finally(() => setMembersLoading(false));
   }, [tripId]);
 
-  // Fetch all members (guests + host) for all roles — guests also need the list
+  // Kick off trip + members fetches in parallel — members doesn't need trip data
   useEffect(() => {
-    if (!trip) return;
+    if (!user) return;
+    api.get<{ trip: Trip }>(`/api/trips/${tripId}`)
+      .then(({ trip }) => { setTrip(trip); setFetching(false); })
+      .catch(() => setFetching(false));
     refreshMembers();
-  }, [trip, refreshMembers]);
+  }, [user, tripId, refreshMembers]);
+
+  const isHost = !!trip && trip.hostUid === user?.uid;
 
   useEffect(() => {
     if (!isHost) return;
