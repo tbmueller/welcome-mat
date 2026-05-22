@@ -117,7 +117,7 @@ export function GuestRoster({
         <ul className="space-y-3">
           {members.map((member) => {
             const memberFlights = flights.filter((f) =>
-              f.passengers.some((p) => p.userUid === member.userUid)
+              (f.passengers ?? []).some((p) => p.userUid === member.userUid)
             );
             const arrival = memberFlights.find((f) => f.direction === "arrival");
             const departure = memberFlights.find((f) => f.direction === "departure");
@@ -253,7 +253,7 @@ export function GuestRoster({
           existingFlights={flights.filter(
             (f) =>
               f.direction === pendingAdd.direction &&
-              !f.passengers.some((p) => p.userUid === pendingAdd.guest.userUid)
+              !(f.passengers ?? []).some((p) => p.userUid === pendingAdd.guest.userUid)
           )}
           onClose={() => setPendingAdd(null)}
           onAdded={() => {
@@ -314,7 +314,7 @@ function FlightRow({ flight, direction, canRemove, removing, onRemove }: FlightR
       ? flight.estimatedArrival ?? flight.scheduledArrival
       : flight.estimatedDeparture ?? flight.scheduledDeparture;
 
-  const otherPassengers = flight.passengers.filter((p, i, arr) =>
+  const otherPassengers = (flight.passengers ?? []).filter((p, i, arr) =>
     arr.findIndex((q) => q.userUid === p.userUid) === i
   );
 
