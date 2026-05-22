@@ -4,14 +4,13 @@ import { useEffect, useState, useCallback } from "react";
 import { useParams, useRouter } from "next/navigation";
 import Link from "next/link";
 import { Button } from "@radix-ui/themes";
-import { GearIcon, PaperPlaneIcon } from "@radix-ui/react-icons";
+import { GearIcon } from "@radix-ui/react-icons";
 import { useAuth } from "@/hooks/useAuth";
 import { api } from "@/lib/apiClient";
 import { db } from "@/lib/firebase";
 import { collection, query, where, onSnapshot } from "firebase/firestore";
 import type { Trip, FlightWithPassengers, SavedAddress } from "@/types";
-import { FlightCard } from "@/components/FlightCard";
-import { AddFlightModal } from "@/components/AddFlightModal";
+import { GuestRoster, type TripMember } from "@/components/GuestRoster";
 import { InviteModal } from "@/components/InviteModal";
 import { AtAGlance } from "@/components/AtAGlance";
 
@@ -25,9 +24,8 @@ export default function TripPage() {
 
   const [trip, setTrip] = useState<Trip | null>(null);
   const [flights, setFlights] = useState<ExtendedFlight[]>([]);
-  const [members, setMembers] = useState<{ userUid: string; displayName: string }[]>([]);
+  const [members, setMembers] = useState<TripMember[]>([]);
   const [savedAddresses, setSavedAddresses] = useState<SavedAddress[]>([]);
-  const [showAddFlight, setShowAddFlight] = useState(false);
   const [showInvite, setShowInvite] = useState(false);
   const [fetching, setFetching] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
@@ -52,14 +50,14 @@ export default function TripPage() {
 
   const isHost = !!trip && trip.hostUid === user?.uid;
 
+  // Fetch all members (guests + host) for all roles — guests also need the list
   useEffect(() => {
-    if (!isHost) return;
+    if (!trip) return;
     api
-      .get<{ members: { userUid: string; displayName: string; role: string }[] }>(
-        `/api/trips/${tripId}/members`
-      )
-      .then(({ members }) => setMembers(members.filter((m) => m.role === "guest")));
-  }, [isHost, tripId]);
+      .get<{ members: TripMember[] }>(`/api/trips/${tripId}/members`)
+      .then(({ members }) => setMembers(members))
+      .catch(() => {});
+  }, [trip, tripId]);
 
   useEffect(() => {
     if (!isHost) return;
@@ -119,9 +117,6 @@ export default function TripPage() {
 
   if (!trip) return <p className="p-8 text-center text-taupe-400 dark:text-taupe-500">Trip not found.</p>;
 
-  const arrivals = flights.filter((f) => f.direction === "arrival");
-  const departures = flights.filter((f) => f.direction === "departure");
-
   return (
     <div className="mx-auto max-w-2xl px-4 py-8">
       <div className="mb-2 flex items-center gap-2 text-sm text-taupe-400 dark:text-taupe-500">
@@ -162,80 +157,15 @@ export default function TripPage() {
         />
       )}
 
-      <section className="mb-8">
-        <h2 className="mb-3 text-sm font-semibold uppercase tracking-wide text-taupe-400 dark:text-taupe-500">
-          Arrivals
-        </h2>
-        {arrivals.length === 0 ? (
-          <p className="text-sm text-taupe-400 dark:text-taupe-500">No arrivals yet.</p>
-        ) : (
-          <ul className="space-y-3">
-            {arrivals
-              .sort((a, b) =>
-                (a.estimatedArrival ?? a.scheduledArrival ?? "").localeCompare(
-                  b.estimatedArrival ?? b.scheduledArrival ?? ""
-                )
-              )
-              .map((f) => (
-                <FlightCard
-                  key={f.id}
-                  flight={f}
-                  isHost={isHost}
-                  currentUserUid={user!.uid}
-                  allMembers={members}
-                  onRemoved={() => refreshTravelTimes()}
-                  onPassengersChanged={() => refreshTravelTimes()}
-                />
-              ))}
-          </ul>
-        )}
-      </section>
-
-      <section className="mb-8">
-        <h2 className="mb-3 text-sm font-semibold uppercase tracking-wide text-taupe-400 dark:text-taupe-500">
-          Departures
-        </h2>
-        {departures.length === 0 ? (
-          <p className="text-sm text-taupe-400 dark:text-taupe-500">No departures yet.</p>
-        ) : (
-          <ul className="space-y-3">
-            {departures
-              .sort((a, b) =>
-                (a.estimatedDeparture ?? a.scheduledDeparture ?? "").localeCompare(
-                  b.estimatedDeparture ?? b.scheduledDeparture ?? ""
-                )
-              )
-              .map((f) => (
-                <FlightCard
-                  key={f.id}
-                  flight={f}
-                  isHost={isHost}
-                  currentUserUid={user!.uid}
-                  allMembers={members}
-                  onRemoved={() => refreshTravelTimes()}
-                  onPassengersChanged={() => refreshTravelTimes()}
-                />
-              ))}
-          </ul>
-        )}
-      </section>
-
-      <button
-        onClick={() => setShowAddFlight(true)}
-        className="w-full rounded-lg border-2 border-dashed border-taupe-300 py-3 text-sm text-taupe-500 transition hover:border-[var(--accent-9)] hover:text-[var(--accent-11)] dark:border-taupe-600 dark:text-taupe-400"
-      >
-        {isHost ? "+ Add a guest's flight" : "+ Add my flight"}
-      </button>
-
-      {showAddFlight && (
-        <AddFlightModal
-          tripId={tripId}
-          isHost={isHost}
-          members={members}
-          onClose={() => setShowAddFlight(false)}
-          onAdded={() => refreshTravelTimes()}
-        />
-      )}
+      <GuestRoster
+        flights={flights}
+        members={members}
+        isHost={isHost}
+        currentUserUid={user!.uid}
+        tripId={tripId}
+        onChanged={() => refreshTravelTimes()}
+        onInvite={() => setShowInvite(true)}
+      />
 
       {showInvite && (
         <InviteModal tripId={tripId} onClose={() => setShowInvite(false)} />
