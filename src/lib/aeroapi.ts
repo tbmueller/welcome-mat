@@ -61,12 +61,15 @@ export async function fetchFlightStatus(
   return {
     airline: flight.operator,
     scheduledDeparture: flight.scheduled_out,
-    estimatedDeparture: flight.estimated_out ?? flight.scheduled_out,
+    // Store null when AeroAPI has no estimate yet — don't fall back to scheduled.
+    // Falling back hides delay state: if estimated_out is null because the delay
+    // hasn't been confirmed, we'd show the scheduled time and nothing looks wrong.
+    estimatedDeparture: flight.estimated_out ?? null,
     departureAirport: flight.origin?.code_iata ?? null,
     departureTerminal: flight.terminal_origin,
     departureGate: flight.gate_origin,
     scheduledArrival: flight.scheduled_in,
-    estimatedArrival: flight.estimated_in ?? flight.scheduled_in,
+    estimatedArrival: flight.estimated_in ?? null,
     arrivalAirport: flight.destination?.code_iata ?? null,
     arrivalTerminal: flight.terminal_destination,
     arrivalGate: flight.gate_destination,

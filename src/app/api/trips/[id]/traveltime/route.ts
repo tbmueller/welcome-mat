@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { verifyIdToken, assertHost } from "@/lib/verifyIdToken";
 import { adminDb } from "@/lib/firebaseAdmin";
-import { getTravelMinutes, buildDirectionsUrl } from "@/lib/geocode";
+import { getTravelMinutes, buildDirectionsUrl, buildAirportDestination } from "@/lib/geocode";
 import type { Flight, FlightStatus, FlightWithPassengers } from "@/types";
 
 // GET /api/trips/[id]/traveltime — returns all flights with leaveBy + directions
@@ -78,15 +78,41 @@ export async function GET(
       const terminal = LIVE_STATUSES.includes(flight.status) ? rawTerminal : null;
 
       // Build destination string for distance matrix + directions link
-      const terminalPart = terminal ? ` Terminal ${terminal}` : "";
-      const side = flight.direction === "arrival" ? "Arrivals" : "Departures";
-      const destination = `${trip.airport}${terminalPart} ${side}`;
+      const destination = buildAirportDestination(trip.airport, terminal, flight.direction);
+
+      const hasOriginOverride = !isNaN(fromLat) && !isNaN(fromLng);
 
       let travelMinutes: number | null = null;
-      try {
-        travelMinutes = await getTravelMinutes(baseLatLng, destination);
-      } catch {
-        // Non-fatal — show null if Maps fails
+      if (hasOriginOverride) {
+        // Custom origin — compute live so it reflects the override location.
+        // Pass approximate leave time for better traffic modeling.
+        const relevantTimeMs =
+          flight.direction === "arrival"
+            ? new Date(flight.estimatedArrival ?? flight.scheduledArrival ?? "").getTime()
+            : new Date(flight.estimatedDeparture ?? flight.scheduledDeparture ?? "").getTime();
+        const bufferMs =
+          flight.direction === "departure" ? 150 * 60_000 : 15 * 60_000;
+        const approxLeaveBy = relevantTimeMs - bufferMs;
+        const depTimeUnix =
+          !isNaN(approxLeaveBy) && approxLeaveBy > Date.now()
+            ? Math.floor(approxLeaveBy / 1000)
+            : undefined;
+        try {
+          travelMinutes = await getTravelMinutes(baseLatLng, destination, depTimeUnix);
+        } catch {
+          // Non-fatal
+        }
+      } else {
+        // No override — use the value the cron already cached on the flight doc.
+        // Fall back to a live Maps call only if the cron hasn't populated it yet.
+        travelMinutes = flight.travelMinutes ?? null;
+        if (travelMinutes === null) {
+          try {
+            travelMinutes = await getTravelMinutes(baseLatLng, destination);
+          } catch {
+            // Non-fatal
+          }
+        }
       }
 
       // Determine the relevant flight time

@@ -97,6 +97,7 @@ export interface Flight {
 
   status: FlightStatus;
   lastPolled: string | null;
+  travelMinutes: number | null; // cached from cron, based on trip.baseLatLng
 }
 
 export interface Passenger {

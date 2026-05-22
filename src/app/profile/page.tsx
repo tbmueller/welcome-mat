@@ -77,7 +77,7 @@ export default function ProfilePage() {
         <div className="flex items-center gap-2 text-sm text-taupe-400 dark:text-taupe-500">
           <Link href="/dashboard" className="hover:text-taupe-700 dark:hover:text-taupe-300">Trips</Link>
           <span>›</span>
-          <span>Profile</span>
+          <span>My Settings</span>
         </div>
       </div>
 

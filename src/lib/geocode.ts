@@ -17,11 +17,19 @@ export async function geocodeAddress(
 
 export async function getTravelMinutes(
   originLatLng: { lat: number; lng: number },
-  destination: string
+  destination: string,
+  /** Unix timestamp (seconds). When provided and in the future, Maps uses
+   *  historical traffic patterns for that time of day. Falls back to live
+   *  traffic when omitted or when the time is already in the past. */
+  departureTimeUnix?: number
 ): Promise<number> {
   const origin = `${originLatLng.lat},${originLatLng.lng}`;
   const dest = encodeURIComponent(destination);
-  const url = `https://maps.googleapis.com/maps/api/distancematrix/json?origins=${origin}&destinations=${dest}&mode=driving&departure_time=now&key=${process.env.GOOGLE_MAPS_KEY}`;
+  const depTime =
+    departureTimeUnix && departureTimeUnix > Date.now() / 1000
+      ? departureTimeUnix
+      : "now";
+  const url = `https://maps.googleapis.com/maps/api/distancematrix/json?origins=${origin}&destinations=${dest}&mode=driving&departure_time=${depTime}&key=${process.env.GOOGLE_MAPS_KEY}`;
 
   const res = await fetch(url);
   if (!res.ok) throw new Error("Distance Matrix request failed");
@@ -36,6 +44,18 @@ export async function getTravelMinutes(
   const seconds =
     (element.duration_in_traffic ?? element.duration).value as number;
   return Math.ceil(seconds / 60);
+}
+
+/** Builds the airport destination string used for both Distance Matrix and
+ *  the directions URL — e.g. "SFO Terminal 2 Arrivals" or "SFO Departures". */
+export function buildAirportDestination(
+  iataCode: string,
+  terminal: string | null | undefined,
+  direction: "arrival" | "departure"
+): string {
+  const terminalPart = terminal ? ` Terminal ${terminal}` : "";
+  const side = direction === "arrival" ? "Arrivals" : "Departures";
+  return `${iataCode}${terminalPart} ${side}`;
 }
 
 export function buildDirectionsUrl(

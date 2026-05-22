@@ -40,7 +40,7 @@ export function NavBar() {
               My trips
             </DropdownMenu.Item>
             <DropdownMenu.Item onSelect={() => router.push("/profile")}>
-              Profile
+              My Settings
             </DropdownMenu.Item>
             <DropdownMenu.Separator />
             <ThemeColorPicker />
