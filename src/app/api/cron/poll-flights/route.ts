@@ -1,5 +1,4 @@
 import { NextRequest, NextResponse } from "next/server";
-import { Receiver } from "@upstash/qstash";
 import { adminDb } from "@/lib/firebaseAdmin";
 import { fetchFlightStatus } from "@/lib/aeroapi";
 import { getTravelMinutes, buildAirportDestination } from "@/lib/geocode";
@@ -8,20 +7,11 @@ import type { FlightStatus } from "@/types";
 const LOCK_DOC = "pollLock";
 const LOCK_TTL_MS = 4 * 60 * 1000; // 4 minutes — cron fires every 5
 
-// POST /api/cron/poll-flights — triggered by Upstash QStash every 5 minutes
+// POST /api/cron/poll-flights — triggered by Vercel Cron every 5 minutes
 export async function POST(req: NextRequest) {
-  const receiver = new Receiver({
-    currentSigningKey: process.env.QSTASH_CURRENT_SIGNING_KEY!,
-    nextSigningKey: process.env.QSTASH_NEXT_SIGNING_KEY!,
-  });
-
-  const body = await req.text();
-  const isValid = await receiver.verify({
-    signature: req.headers.get("upstash-signature") ?? "",
-    body,
-  }).catch(() => false);
-
-  if (!isValid) {
+  const secret = process.env.CRON_SECRET;
+  const auth = req.headers.get("authorization");
+  if (!secret || auth !== `Bearer ${secret}`) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
@@ -56,10 +46,12 @@ export async function POST(req: NextRequest) {
       // AeroAPI pushes their estimate beyond +24h — exactly what happens when a
       // flight is progressively delayed. Scheduled time is immutable, so the
       // flight stays eligible regardless of how far the estimate drifts.
+      // Fall back to estimated only when scheduled is null (e.g. AeroAPI hadn't
+      // published a schedule yet when the flight was first added).
       const scheduledTime =
         data.direction === "arrival"
-          ? data.scheduledArrival
-          : data.scheduledDeparture;
+          ? (data.scheduledArrival ?? data.estimatedArrival)
+          : (data.scheduledDeparture ?? data.estimatedDeparture);
       if (!scheduledTime) return false;
       const t = new Date(scheduledTime).getTime();
       return t >= windowStart.getTime() && t <= windowEnd.getTime();
@@ -82,7 +74,13 @@ export async function POST(req: NextRequest) {
     for (const doc of toUpdate) {
       const data = doc.data();
       try {
-        const freshData = await fetchFlightStatus(data.flightNumber, data.date);
+        // Pass the stored scheduledDeparture so fetchFlightStatus can pin to
+        // the correct leg when a flight number operates multiple times per day.
+        const freshData = await fetchFlightStatus(
+          data.flightNumber,
+          data.date,
+          data.scheduledDeparture ?? null
+        );
         if (!freshData) continue;
 
         // Compute travel time from the trip's base address.

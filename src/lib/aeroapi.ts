@@ -32,14 +32,20 @@ function mapStatus(raw: string): FlightStatus {
 
 export async function fetchFlightStatus(
   flightNumber: string,
-  date: string
+  date: string,
+  /** Previously stored scheduledDeparture — used to pin to the correct leg when
+   *  a flight number operates multiple times per day (e.g. UA1486 has two legs
+   *  on 5/22). Without this hint we'd risk toggling between legs on every poll. */
+  knownScheduledDeparture?: string | null
 ): Promise<Partial<Flight> | null> {
   const url = new URL(`${AEROAPI_BASE}/flights/${encodeURIComponent(flightNumber)}`);
-  // Narrow the search window to ±1 day around the flight date
+  // ±2 days in UTC to avoid cutting off late-night departures.
+  // new Date("YYYY-MM-DD") is UTC midnight, so a flight at 11pm Pacific is
+  // 06:00 UTC the next calendar day — it falls outside a ±1 day window.
   const start = new Date(date);
   start.setDate(start.getDate() - 1);
   const end = new Date(date);
-  end.setDate(end.getDate() + 1);
+  end.setDate(end.getDate() + 2);
   url.searchParams.set("start", start.toISOString());
   url.searchParams.set("end", end.toISOString());
   url.searchParams.set("max_pages", "1");
@@ -55,8 +61,26 @@ export async function fetchFlightStatus(
   if (!res.ok) throw new Error(`AeroAPI error: ${res.status}`);
 
   const data = await res.json();
-  const flight: AeroApiFlight | undefined = data.flights?.[0];
-  if (!flight) return null;
+  const all: AeroApiFlight[] = data.flights ?? [];
+  if (all.length === 0) return null;
+
+  let flight: AeroApiFlight | undefined;
+
+  if (knownScheduledDeparture) {
+    // We already know which leg we want — find the one whose scheduled_out
+    // matches exactly. This prevents the cron from bouncing between legs.
+    flight = all.find((f) => f.scheduled_out === knownScheduledDeparture);
+  }
+
+  if (!flight) {
+    // First fetch (or scheduled time changed): take the earliest departure
+    // whose scheduled_out date portion matches the given date in UTC.
+    // Sorting ensures consistent selection when multiple legs share a date.
+    const onDate = all
+      .filter((f) => f.scheduled_out?.startsWith(date))
+      .sort((a, b) => (a.scheduled_out ?? "").localeCompare(b.scheduled_out ?? ""));
+    flight = onDate[0] ?? all[0]; // last resort: take first result
+  }
 
   return {
     airline: flight.operator,
