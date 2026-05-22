@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { verifyIdToken, assertHost } from "@/lib/verifyIdToken";
 import { adminDb } from "@/lib/firebaseAdmin";
 import { getTravelMinutes, buildDirectionsUrl } from "@/lib/geocode";
-import type { Flight, FlightWithPassengers } from "@/types";
+import type { Flight, FlightStatus, FlightWithPassengers } from "@/types";
 
 // GET /api/trips/[id]/traveltime — returns all flights with leaveBy + directions
 export async function GET(
@@ -65,10 +65,17 @@ export async function GET(
 
   const results: FlightWithPassengers[] = await Promise.all(
     flights.map(async (flight) => {
-      const terminal =
+      const rawTerminal =
         flight.direction === "arrival"
           ? flight.arrivalTerminal
           : flight.departureTerminal;
+
+      // AeroAPI frequently returns stale historical terminal assignments for
+      // scheduled future flights (e.g. a SFO flight showing JFK Terminal 7).
+      // Only trust terminal data once the flight is actively operating and
+      // AeroAPI is publishing real-time gate info.
+      const LIVE_STATUSES: FlightStatus[] = ["departed", "en_route", "landed", "arrived"];
+      const terminal = LIVE_STATUSES.includes(flight.status) ? rawTerminal : null;
 
       // Build destination string for distance matrix + directions link
       const terminalPart = terminal ? ` Terminal ${terminal}` : "";

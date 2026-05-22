@@ -129,6 +129,9 @@ export function FlightCard({ flight, isHost, currentUserUid, allMembers = [], on
             {terminal && (
               <span className="text-taupe-400 dark:text-taupe-500">
                 Terminal {terminal}{gate ? `, Gate ${gate}` : ""}
+                {(flight.status === "scheduled" || flight.status === "pending" || flight.status === "unknown") && (
+                  <span className="ml-1 text-xs opacity-60">(unconfirmed)</span>
+                )}
               </span>
             )}
           </div>
