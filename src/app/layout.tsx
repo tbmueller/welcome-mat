@@ -9,10 +9,32 @@ import { NavBar } from "@/components/NavBar";
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
+  metadataBase: new URL("https://welcome-mat.app"),
   title: "WelcomeMat",
-  description: "Track your guests' flights",
+  description: "Track your guests' flights and know exactly when to leave.",
   verification: {
     google: ["LmJYkYRdAYhuB01a-n1rLmUSWrF_sITwutRH28UirEI", "grzgpl2kmsXM_L0JWLb07T49E1XV237rDqYH0Lb7SnU"],
+  },
+  openGraph: {
+    title: "WelcomeMat",
+    description: "Track your guests' flights and know exactly when to leave.",
+    url: "https://welcome-mat.app",
+    siteName: "WelcomeMat",
+    images: [
+      {
+        url: "/mat-logo-pink-square.png",
+        width: 512,
+        height: 512,
+        alt: "WelcomeMat logo",
+      },
+    ],
+    type: "website",
+  },
+  twitter: {
+    card: "summary",
+    title: "WelcomeMat",
+    description: "Track your guests' flights and know exactly when to leave.",
+    images: ["/mat-logo-pink-square.png"],
   },
 };
 
