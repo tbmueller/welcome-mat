@@ -64,5 +64,7 @@ export async function POST(req: NextRequest) {
   }
 
   await batch.commit();
-  return NextResponse.json({ id: ref.id });
+  // Return the full object so callers can use latLng immediately (e.g. AtAGlance
+  // needs coords to fire a travel-time refetch without a second round-trip).
+  return NextResponse.json({ id: ref.id, label, address, latLng, isDefault: makeDefault });
 }

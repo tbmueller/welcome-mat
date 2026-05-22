@@ -2,7 +2,11 @@
 
 import { useEffect, useState } from "react";
 import { format, parseISO } from "date-fns";
-import { Button, Select } from "@radix-ui/themes";
+import { Button, Checkbox, Select, TextField } from "@radix-ui/themes";
+import { useQueryClient } from "@tanstack/react-query";
+import { api } from "@/lib/apiClient";
+import { qk } from "@/lib/queryClient";
+import { AddressAutocomplete } from "@/components/AddressAutocomplete";
 import type { FlightWithPassengers, SavedAddress } from "@/types";
 
 type ExtendedFlight = FlightWithPassengers & { directionsUrl?: string };
@@ -38,9 +42,19 @@ function fmt(iso: string | null | undefined): string {
   return format(parseISO(iso), "h:mm a");
 }
 
+const inputCls = "w-full rounded-lg border border-taupe-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[var(--accent-9)] dark:border-taupe-600 dark:bg-taupe-700 dark:text-taupe-100 dark:placeholder-taupe-400";
+
 export function AtAGlance({ flights, trip, savedAddresses, onOriginChange, onRefresh, refreshing }: Props) {
+  const queryClient = useQueryClient();
   const [now, setNow] = useState(() => Date.now());
   const [selectedOriginId, setSelectedOriginId] = useState("trip");
+
+  // "Add address" inline form state
+  const [newAddress, setNewAddress] = useState("");
+  const [newLabel, setNewLabel] = useState("");
+  const [makeDefault, setMakeDefault] = useState(false);
+  const [saving, setSaving] = useState(false);
+  const [saveError, setSaveError] = useState("");
 
   useEffect(() => {
     const id = setInterval(() => setNow(Date.now()), 30_000);
@@ -63,12 +77,54 @@ export function AtAGlance({ flights, trip, savedAddresses, onOriginChange, onRef
 
   function handleOriginChange(id: string) {
     setSelectedOriginId(id);
+    setSaveError("");
+    if (id === "new") return; // inline form handles its own submit
     const origin = origins.find((o) => o.id === id);
     if (!origin) return;
     if (id === "trip") {
       onOriginChange(null, null);
     } else {
       onOriginChange(origin.latLng, origin.address);
+    }
+  }
+
+  function handleCancelNew() {
+    setSelectedOriginId("trip");
+    setNewAddress("");
+    setNewLabel("");
+    setMakeDefault(false);
+    setSaveError("");
+  }
+
+  async function handleSaveNew(e: React.FormEvent) {
+    e.preventDefault();
+    if (!newAddress.trim() || !newLabel.trim()) return;
+    setSaving(true);
+    setSaveError("");
+    try {
+      const res = await api.post<{
+        id: string;
+        label: string;
+        address: string;
+        latLng: { lat: number; lng: number };
+        isDefault: boolean;
+      }>("/api/addresses", { label: newLabel.trim(), address: newAddress.trim(), makeDefault });
+
+      // Immediately use the new address as the origin (coords come back in response)
+      onOriginChange(res.latLng, res.address);
+      setSelectedOriginId(res.id);
+
+      // Update the dropdown so the new address appears without a page reload
+      queryClient.invalidateQueries({ queryKey: qk.addresses() });
+
+      // Reset form
+      setNewAddress("");
+      setNewLabel("");
+      setMakeDefault(false);
+    } catch (err: unknown) {
+      setSaveError(err instanceof Error ? err.message : "Failed to save address");
+    } finally {
+      setSaving(false);
     }
   }
 
@@ -106,16 +162,55 @@ export function AtAGlance({ flights, trip, savedAddresses, onOriginChange, onRef
         </Button>
       </div>
 
-      <div className="mb-4 flex items-center gap-2">
-        <span className="text-xs text-[var(--accent-11)] whitespace-nowrap">Departing from</span>
-        <Select.Root value={selectedOriginId} onValueChange={handleOriginChange}>
-          <Select.Trigger className="min-w-0 flex-1" />
-          <Select.Content>
-            {origins.map((o) => (
-              <Select.Item key={o.id} value={o.id}>{o.label}</Select.Item>
-            ))}
-          </Select.Content>
-        </Select.Root>
+      <div className="mb-4 space-y-3">
+        <div className="flex items-center gap-2">
+          <span className="text-xs text-[var(--accent-11)] whitespace-nowrap">Departing from</span>
+          <Select.Root value={selectedOriginId} onValueChange={handleOriginChange}>
+            <Select.Trigger className="min-w-0 flex-1" />
+            <Select.Content>
+              {origins.map((o) => (
+                <Select.Item key={o.id} value={o.id}>{o.label}</Select.Item>
+              ))}
+              <Select.Separator />
+              <Select.Item value="new">+ Add address…</Select.Item>
+            </Select.Content>
+          </Select.Root>
+        </div>
+
+        {selectedOriginId === "new" && (
+          <form
+            onSubmit={handleSaveNew}
+            className="rounded-lg border border-taupe-200 bg-white p-3 space-y-2 shadow-sm dark:border-taupe-700 dark:bg-taupe-800"
+          >
+            <AddressAutocomplete
+              value={newAddress}
+              onChange={setNewAddress}
+              onSelect={setNewAddress}
+              placeholder="Full address"
+              required
+              className={inputCls}
+            />
+            <TextField.Root
+              value={newLabel}
+              onChange={(e) => setNewLabel(e.target.value)}
+              placeholder="Label (e.g. Hotel, Mom's house)"
+              required
+            />
+            <label className="flex items-center gap-2 text-sm text-taupe-600 dark:text-taupe-300">
+              <Checkbox checked={makeDefault} onCheckedChange={(v) => setMakeDefault(!!v)} />
+              Make this my default
+            </label>
+            {saveError && <p className="text-xs text-red-500 dark:text-red-400">{saveError}</p>}
+            <div className="flex gap-2 pt-1">
+              <Button type="button" variant="outline" color="gray" size="1" onClick={handleCancelNew} className="flex-1">
+                Cancel
+              </Button>
+              <Button type="submit" size="1" disabled={saving || !newAddress.trim() || !newLabel.trim()} className="flex-1">
+                {saving ? "Saving…" : "Save & use"}
+              </Button>
+            </div>
+          </form>
+        )}
       </div>
 
       {delayedCount > 0 && (
