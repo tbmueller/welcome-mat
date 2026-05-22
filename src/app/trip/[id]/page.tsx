@@ -50,14 +50,18 @@ export default function TripPage() {
 
   const isHost = !!trip && trip.hostUid === user?.uid;
 
-  // Fetch all members (guests + host) for all roles — guests also need the list
-  useEffect(() => {
-    if (!trip) return;
-    api
+  const refreshMembers = useCallback(async () => {
+    await api
       .get<{ members: TripMember[] }>(`/api/trips/${tripId}/members`)
       .then(({ members }) => setMembers(members))
       .catch(() => {});
-  }, [trip, tripId]);
+  }, [tripId]);
+
+  // Fetch all members (guests + host) for all roles — guests also need the list
+  useEffect(() => {
+    if (!trip) return;
+    refreshMembers();
+  }, [trip, refreshMembers]);
 
   useEffect(() => {
     if (!isHost) return;
@@ -163,7 +167,7 @@ export default function TripPage() {
         isHost={isHost}
         currentUserUid={user!.uid}
         tripId={tripId}
-        onChanged={() => refreshTravelTimes()}
+        onChanged={() => { refreshMembers(); refreshTravelTimes(); }}
         onInvite={() => setShowInvite(true)}
       />
 
