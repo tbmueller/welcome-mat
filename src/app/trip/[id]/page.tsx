@@ -25,6 +25,7 @@ export default function TripPage() {
   const [trip, setTrip] = useState<Trip | null>(null);
   const [flights, setFlights] = useState<ExtendedFlight[]>([]);
   const [members, setMembers] = useState<TripMember[]>([]);
+  const [membersLoading, setMembersLoading] = useState(true);
   const [savedAddresses, setSavedAddresses] = useState<SavedAddress[]>([]);
   const [showInvite, setShowInvite] = useState(false);
   const [fetching, setFetching] = useState(true);
@@ -51,10 +52,12 @@ export default function TripPage() {
   const isHost = !!trip && trip.hostUid === user?.uid;
 
   const refreshMembers = useCallback(async () => {
+    setMembersLoading(true);
     await api
       .get<{ members: TripMember[] }>(`/api/trips/${tripId}/members`)
       .then(({ members }) => setMembers(members))
-      .catch(() => {});
+      .catch(() => {})
+      .finally(() => setMembersLoading(false));
   }, [tripId]);
 
   // Fetch all members (guests + host) for all roles — guests also need the list
@@ -164,6 +167,7 @@ export default function TripPage() {
       <GuestRoster
         flights={flights}
         members={members}
+        membersLoading={membersLoading}
         isHost={isHost}
         currentUserUid={user!.uid}
         tripId={tripId}

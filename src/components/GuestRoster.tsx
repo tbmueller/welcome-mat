@@ -20,6 +20,7 @@ export interface TripMember {
 interface Props {
   flights: ExtendedFlight[];
   members: TripMember[];
+  membersLoading?: boolean;
   isHost: boolean;
   currentUserUid: string;
   tripId: string;
@@ -68,6 +69,7 @@ function initials(name: string): string {
 export function GuestRoster({
   flights,
   members,
+  membersLoading = false,
   isHost,
   currentUserUid,
   tripId,
@@ -111,7 +113,11 @@ export function GuestRoster({
         Guests
       </h2>
 
-      {members.length === 0 ? (
+      {membersLoading ? (
+        <div className="flex justify-center py-6">
+          <div className="h-6 w-6 animate-spin rounded-full border-2 border-[var(--accent-9)] border-t-transparent" />
+        </div>
+      ) : members.length === 0 ? (
         <p className="text-sm text-taupe-400 dark:text-taupe-500">No guests yet.</p>
       ) : (
         <ul className="space-y-3">
