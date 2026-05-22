@@ -12,9 +12,6 @@ const config: CapacitorConfig = {
     allowsLinkPreview: false,
     scrollEnabled: true,
   },
-  android: {
-    allowMixedContent: false,
-  },
   plugins: {
     PushNotifications: {
       presentationOptions: ["badge", "sound", "alert"],
