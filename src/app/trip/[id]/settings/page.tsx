@@ -5,30 +5,26 @@ import { useParams, useRouter } from "next/navigation";
 import Link from "next/link";
 import { Button, Select, TextField, IconButton } from "@radix-ui/themes";
 import { ArrowLeftIcon, Cross2Icon, TrashIcon } from "@radix-ui/react-icons";
+import { useQueryClient } from "@tanstack/react-query";
 import { useAuth } from "@/hooks/useAuth";
+import { useTripDetail, useTripMembers, useSavedAddresses } from "@/hooks/queries";
+import { qk } from "@/lib/queryClient";
 import { api } from "@/lib/apiClient";
-import type { Trip, Membership, SavedAddress } from "@/types";
 import { AddressAutocomplete } from "@/components/AddressAutocomplete";
 import { IataAutocomplete } from "@/components/IataAutocomplete";
 import { InviteModal } from "@/components/InviteModal";
 
-interface MemberRow {
-  userUid: string;
-  role: string;
-  displayName: string;
-  photoURL: string | null;
-}
-
 export default function TripSettingsPage() {
-  const { user, loading, getIdToken } = useAuth();
+  const { user, loading } = useAuth();
   const router = useRouter();
   const params = useParams();
   const tripId = params.id as string;
+  const queryClient = useQueryClient();
 
-  const [trip, setTrip] = useState<Trip | null>(null);
-  const [members, setMembers] = useState<MemberRow[]>([]);
-  const [savedAddresses, setSavedAddresses] = useState<SavedAddress[]>([]);
-  const [fetching, setFetching] = useState(true);
+  const { data: trip, isLoading: tripLoading } = useTripDetail(tripId);
+  const { data: members = [], isLoading: membersLoading } = useTripMembers(tripId);
+  const { data: savedAddresses = [] } = useSavedAddresses();
+
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
   const [showInvite, setShowInvite] = useState(false);
@@ -40,39 +36,26 @@ export default function TripSettingsPage() {
   const [baseAddress, setBaseAddress] = useState("");
   const [selectedAddressId, setSelectedAddressId] = useState<string>("current");
 
+  // Populate form once trip loads
+  useEffect(() => {
+    if (trip) {
+      setName(trip.name);
+      setAirport(trip.airport);
+      setBaseAddress(trip.baseAddress);
+    }
+  }, [trip]);
+
   useEffect(() => {
     if (!loading && !user) router.replace("/");
   }, [user, loading, router]);
 
-  async function load() {
-    try {
-      const [{ trip }, { members }, addressResult] = await Promise.all([
-        api.get<{ trip: Trip }>(`/api/trips/${tripId}`),
-        api.get<{ members: MemberRow[] }>(`/api/trips/${tripId}/members`),
-        api.get<{ addresses: SavedAddress[] }>("/api/addresses").catch(() => ({ addresses: [] as SavedAddress[] })),
-      ]);
-      setTrip(trip);
-      setName(trip.name);
-      setAirport(trip.airport);
-      setBaseAddress(trip.baseAddress);
-      setMembers(members);
-      setSavedAddresses(addressResult.addresses);
-    } catch (err: unknown) {
-      setError(err instanceof Error ? err.message : "Failed to load trip");
-    } finally {
-      setFetching(false);
-    }
-  }
-
-  useEffect(() => {
-    if (user) load();
-  }, [user, tripId]);
-
   const isHost = members.find((m) => m.userUid === user?.uid)?.role === "host";
 
   useEffect(() => {
-    if (!fetching && !isHost) router.replace(`/trip/${tripId}`);
-  }, [fetching, isHost, router, tripId]);
+    if (!membersLoading && members.length > 0 && !isHost) {
+      router.replace(`/trip/${tripId}`);
+    }
+  }, [membersLoading, isHost, router, tripId, members.length]);
 
   function handleAddressSelect(id: string) {
     setSelectedAddressId(id);
@@ -91,6 +74,8 @@ export default function TripSettingsPage() {
         airport: airport.trim().toUpperCase(),
         baseAddress,
       });
+      queryClient.invalidateQueries({ queryKey: qk.trip(tripId) });
+      queryClient.invalidateQueries({ queryKey: qk.trips() });
       router.push(`/trip/${tripId}`);
     } catch (err: unknown) {
       setError(err instanceof Error ? err.message : "Failed to save");
@@ -103,6 +88,8 @@ export default function TripSettingsPage() {
     if (!confirm(`Delete "${trip?.name}"? This cannot be undone.`)) return;
     try {
       await api.delete(`/api/trips/${tripId}`);
+      queryClient.invalidateQueries({ queryKey: qk.trips() });
+      queryClient.removeQueries({ queryKey: qk.trip(tripId) });
       router.replace("/dashboard");
     } catch (err: unknown) {
       setError(err instanceof Error ? err.message : "Failed to delete trip");
@@ -111,13 +98,9 @@ export default function TripSettingsPage() {
 
   async function handleRemoveMember(uid: string, displayName: string) {
     if (!confirm(`Remove ${displayName} from this trip?`)) return;
-    const token = await getIdToken();
-    await fetch(`/api/trips/${tripId}/members`, {
-      method: "DELETE",
-      headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
-      body: JSON.stringify({ userUid: uid }),
-    });
-    load();
+    await api.delete(`/api/trips/${tripId}/members`, { userUid: uid });
+    queryClient.invalidateQueries({ queryKey: qk.members(tripId) });
+    queryClient.invalidateQueries({ queryKey: qk.traveltime(tripId) });
   }
 
   async function handleAddGuest(e: React.FormEvent) {
@@ -127,13 +110,15 @@ export default function TripSettingsPage() {
     try {
       await api.post(`/api/trips/${tripId}/members`, { displayName: newGuestName.trim() });
       setNewGuestName("");
-      load();
+      queryClient.invalidateQueries({ queryKey: qk.members(tripId) });
     } catch (err: unknown) {
       setError(err instanceof Error ? err.message : "Failed to add guest");
     } finally {
       setAddingGuest(false);
     }
   }
+
+  const fetching = tripLoading || membersLoading;
 
   if (loading || fetching) {
     return (
@@ -237,7 +222,6 @@ export default function TripSettingsPage() {
               <li key={m.userUid} className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
                   {m.photoURL && (
-                    // eslint-disable-next-line @next/next/no-img-element
                     <img src={m.photoURL} alt={m.displayName} className="h-7 w-7 rounded-full object-cover" />
                   )}
                   <span className="text-sm">{m.displayName}</span>

@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { Button, Checkbox, Select, TextField } from "@radix-ui/themes";
 import { api } from "@/lib/apiClient";
-import type { SavedAddress } from "@/types";
+import { useSavedAddresses } from "@/hooks/queries";
 import { AddressAutocomplete } from "@/components/AddressAutocomplete";
 import { IataAutocomplete } from "@/components/IataAutocomplete";
 import { Modal } from "@/components/Modal";
@@ -16,7 +16,6 @@ interface Props {
 export function CreateTripModal({ onClose, onCreated }: Props) {
   const [name, setName] = useState("");
   const [airport, setAirport] = useState("");
-  const [savedAddresses, setSavedAddresses] = useState<SavedAddress[]>([]);
   const [selectedAddressId, setSelectedAddressId] = useState<string>("new");
   const [baseAddress, setBaseAddress] = useState("");
   const [saveAddress, setSaveAddress] = useState(false);
@@ -25,16 +24,18 @@ export function CreateTripModal({ onClose, onCreated }: Props) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
+  const { data: savedAddresses = [] } = useSavedAddresses();
+
+  // Pre-select the default address once addresses load
   useEffect(() => {
-    api.get<{ addresses: SavedAddress[] }>("/api/addresses").then(({ addresses }) => {
-      setSavedAddresses(addresses);
-      const def = addresses.find((a) => a.isDefault);
+    if (savedAddresses.length > 0 && selectedAddressId === "new") {
+      const def = savedAddresses.find((a) => a.isDefault);
       if (def) {
         setSelectedAddressId(def.id);
         setBaseAddress(def.address);
       }
-    });
-  }, []);
+    }
+  }, [savedAddresses]); // eslint-disable-line react-hooks/exhaustive-deps
 
   function handleAddressSelect(id: string) {
     setSelectedAddressId(id);

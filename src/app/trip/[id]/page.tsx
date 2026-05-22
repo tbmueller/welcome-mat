@@ -1,16 +1,18 @@
 "use client";
 
-import { useEffect, useState, useCallback } from "react";
+import { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import Link from "next/link";
 import { Button } from "@radix-ui/themes";
 import { GearIcon } from "@radix-ui/react-icons";
-import { useAuth } from "@/hooks/useAuth";
-import { api } from "@/lib/apiClient";
-import { db } from "@/lib/firebase";
+import { useQueryClient } from "@tanstack/react-query";
 import { collection, query, where, onSnapshot } from "firebase/firestore";
-import type { Trip, FlightWithPassengers, SavedAddress } from "@/types";
-import { GuestRoster, type TripMember } from "@/components/GuestRoster";
+import { useAuth } from "@/hooks/useAuth";
+import { useTripDetail, useTripMembers, useTravelTime, useSavedAddresses } from "@/hooks/queries";
+import { qk } from "@/lib/queryClient";
+import { db } from "@/lib/firebase";
+import type { FlightWithPassengers } from "@/types";
+import { GuestRoster } from "@/components/GuestRoster";
 import { InviteModal } from "@/components/InviteModal";
 import { AtAGlance } from "@/components/AtAGlance";
 
@@ -21,95 +23,58 @@ export default function TripPage() {
   const router = useRouter();
   const params = useParams();
   const tripId = params.id as string;
+  const queryClient = useQueryClient();
 
-  const [trip, setTrip] = useState<Trip | null>(null);
-  const [flights, setFlights] = useState<ExtendedFlight[]>([]);
-  const [members, setMembers] = useState<TripMember[]>([]);
-  const [membersLoading, setMembersLoading] = useState(true);
-  const [savedAddresses, setSavedAddresses] = useState<SavedAddress[]>([]);
   const [showInvite, setShowInvite] = useState(false);
-  const [fetching, setFetching] = useState(true);
-  const [refreshing, setRefreshing] = useState(false);
-
-  // Optional origin override for travel time (null = use trip default)
   const [originOverride, setOriginOverride] = useState<{
-    latLng: { lat: number; lng: number };
-    address: string;
+    lat: number; lng: number; address: string;
   } | null>(null);
+
+  // Guest Firestore snapshot for non-hosts (no travel time data needed)
+  const [guestFlights, setGuestFlights] = useState<ExtendedFlight[]>([]);
 
   useEffect(() => {
     if (!loading && !user) router.replace("/");
   }, [user, loading, router]);
 
-  const refreshMembers = useCallback(async () => {
-    setMembersLoading(true);
-    await api
-      .get<{ members: TripMember[] }>(`/api/trips/${tripId}/members`)
-      .then(({ members }) => setMembers(members))
-      .catch(() => {})
-      .finally(() => setMembersLoading(false));
-  }, [tripId]);
-
-  // Kick off trip + members fetches in parallel — members doesn't need trip data
-  useEffect(() => {
-    if (!user) return;
-    api.get<{ trip: Trip }>(`/api/trips/${tripId}`)
-      .then(({ trip }) => { setTrip(trip); setFetching(false); })
-      .catch(() => setFetching(false));
-    refreshMembers();
-  }, [user, tripId, refreshMembers]);
+  const { data: trip, isLoading: tripLoading } = useTripDetail(tripId);
+  const { data: members = [], isLoading: membersLoading } = useTripMembers(tripId);
 
   const isHost = !!trip && trip.hostUid === user?.uid;
 
-  useEffect(() => {
-    if (!isHost) return;
-    api
-      .get<{ addresses: SavedAddress[] }>("/api/addresses")
-      .then(({ addresses }) => setSavedAddresses(addresses))
-      .catch(() => {});
-  }, [isHost]);
+  const {
+    data: hostFlights = [],
+    isFetching: travelTimeFetching,
+    refetch: refetchTravelTime,
+  } = useTravelTime(tripId, isHost, originOverride);
 
-  const refreshTravelTimes = useCallback(async (origin?: { latLng: { lat: number; lng: number }; address: string } | null) => {
-    if (!isHost) return;
-    setRefreshing(true);
-    try {
-      const qs = new URLSearchParams();
-      const o = origin !== undefined ? origin : originOverride;
-      if (o) {
-        qs.set("fromLat", String(o.latLng.lat));
-        qs.set("fromLng", String(o.latLng.lng));
-        qs.set("fromAddress", o.address);
-      }
-      const url = `/api/trips/${tripId}/traveltime${qs.size ? `?${qs}` : ""}`;
-      const data = await api.get<{ flights: ExtendedFlight[] }>(url);
-      setFlights(data.flights);
-    } finally {
-      setRefreshing(false);
-    }
-  }, [isHost, tripId, originOverride]);
+  const { data: savedAddresses = [] } = useSavedAddresses();
 
-  useEffect(() => {
-    if (!isHost) return;
-    refreshTravelTimes();
-  }, [isHost, refreshTravelTimes]);
-
-  // Real-time listener on flights for this trip
+  // Real-time Firestore listener for guests
   useEffect(() => {
     if (!user || isHost) return;
     const q = query(collection(db, "flights"), where("tripId", "==", tripId));
     const unsub = onSnapshot(q, (snap) => {
-      setFlights(snap.docs.map((d) => ({ id: d.id, ...d.data() } as ExtendedFlight)));
+      setGuestFlights(snap.docs.map((d) => ({ id: d.id, ...d.data() } as ExtendedFlight)));
     });
     return unsub;
   }, [user, tripId, isHost]);
 
-  function handleOriginChange(latLng: { lat: number; lng: number } | null, address: string | null) {
-    const next = latLng && address ? { latLng, address } : null;
-    setOriginOverride(next);
-    refreshTravelTimes(next);
+  const flights = isHost ? hostFlights : guestFlights;
+
+  function handleOriginChange(
+    latLng: { lat: number; lng: number } | null,
+    address: string | null
+  ) {
+    setOriginOverride(latLng && address ? { lat: latLng.lat, lng: latLng.lng, address } : null);
   }
 
-  if (loading || fetching) {
+  function handleChanged() {
+    queryClient.invalidateQueries({ queryKey: qk.members(tripId) });
+    queryClient.invalidateQueries({ queryKey: qk.traveltime(tripId, originOverride) });
+  }
+
+  if (loading || tripLoading) {
     return (
       <div className="flex min-h-screen items-center justify-center">
         <div className="h-8 w-8 animate-spin rounded-full border-4 border-[var(--accent-9)] border-t-transparent" />
@@ -154,8 +119,8 @@ export default function TripPage() {
           trip={trip}
           savedAddresses={savedAddresses}
           onOriginChange={handleOriginChange}
-          onRefresh={() => refreshTravelTimes()}
-          refreshing={refreshing}
+          onRefresh={() => refetchTravelTime()}
+          refreshing={travelTimeFetching}
         />
       )}
 
@@ -166,7 +131,7 @@ export default function TripPage() {
         isHost={isHost}
         currentUserUid={user!.uid}
         tripId={tripId}
-        onChanged={() => { refreshMembers(); refreshTravelTimes(); }}
+        onChanged={handleChanged}
         onInvite={() => setShowInvite(true)}
       />
 

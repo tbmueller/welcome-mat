@@ -1,44 +1,42 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { Button } from "@radix-ui/themes";
+import { useQueryClient } from "@tanstack/react-query";
 import { useAuth } from "@/hooks/useAuth";
+import { useTrips, useNotifications } from "@/hooks/queries";
+import { qk } from "@/lib/queryClient";
 import { api } from "@/lib/apiClient";
-import type { Trip, GuestMergedNotification } from "@/types";
 import { CreateTripModal } from "@/components/CreateTripModal";
+import { useState } from "react";
 
 export default function DashboardPage() {
   const { user, loading, signOut } = useAuth();
   const router = useRouter();
-  const [trips, setTrips] = useState<Trip[]>([]);
-  const [fetching, setFetching] = useState(true);
+  const queryClient = useQueryClient();
   const [showCreate, setShowCreate] = useState(false);
-  const [notifications, setNotifications] = useState<GuestMergedNotification[]>([]);
+
+  const { data: trips = [], isLoading: tripsLoading } = useTrips();
+  const { data: notifications = [] } = useNotifications();
 
   useEffect(() => {
     if (!loading && !user) router.replace("/");
   }, [user, loading, router]);
 
-  useEffect(() => {
-    if (!user) return;
-    Promise.all([
-      api.get<{ trips: Trip[] }>("/api/trips"),
-      api.get<{ notifications: GuestMergedNotification[] }>("/api/notifications"),
-    ]).then(([tripsRes, notifRes]) => {
-      setTrips(tripsRes.trips);
-      setNotifications(notifRes.notifications ?? []);
-      setFetching(false);
+  async function dismissNotification(id: string) {
+    // Optimistic remove
+    queryClient.setQueryData(
+      qk.notifications(),
+      (prev: typeof notifications) => prev.filter((n) => n.id !== id)
+    );
+    api.patch(`/api/notifications/${id}`, {}).catch(() => {
+      queryClient.invalidateQueries({ queryKey: qk.notifications() });
     });
-  }, [user]);
-
-  function dismissNotification(id: string) {
-    setNotifications((prev) => prev.filter((n) => n.id !== id));
-    api.patch(`/api/notifications/${id}`, {});
   }
 
-  if (loading || fetching) {
+  if (loading || (tripsLoading && !trips.length)) {
     return (
       <div className="flex min-h-screen items-center justify-center">
         <div className="h-8 w-8 animate-spin rounded-full border-4 border-[var(--accent-9)] border-t-transparent" />
@@ -107,6 +105,7 @@ export default function DashboardPage() {
           onClose={() => setShowCreate(false)}
           onCreated={(id) => {
             setShowCreate(false);
+            queryClient.invalidateQueries({ queryKey: qk.trips() });
             router.push(`/trip/${id}`);
           }}
         />

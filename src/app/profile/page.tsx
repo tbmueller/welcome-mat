@@ -5,15 +5,19 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { Button, Checkbox, TextField, IconButton } from "@radix-ui/themes";
 import { ArrowLeftIcon, TrashIcon } from "@radix-ui/react-icons";
+import { useQueryClient } from "@tanstack/react-query";
 import { useAuth } from "@/hooks/useAuth";
+import { useSavedAddresses } from "@/hooks/queries";
+import { qk } from "@/lib/queryClient";
 import { api } from "@/lib/apiClient";
-import type { SavedAddress } from "@/types";
 
 export default function ProfilePage() {
   const { user, loading } = useAuth();
   const router = useRouter();
-  const [addresses, setAddresses] = useState<SavedAddress[]>([]);
-  const [fetching, setFetching] = useState(true);
+  const queryClient = useQueryClient();
+
+  const { data: addresses = [], isLoading: addressesLoading } = useSavedAddresses();
+
   const [showAdd, setShowAdd] = useState(false);
   const [newLabel, setNewLabel] = useState("");
   const [newAddress, setNewAddress] = useState("");
@@ -25,17 +29,6 @@ export default function ProfilePage() {
     if (!loading && !user) router.replace("/");
   }, [user, loading, router]);
 
-  function loadAddresses() {
-    api.get<{ addresses: SavedAddress[] }>("/api/addresses").then(({ addresses }) => {
-      setAddresses(addresses);
-      setFetching(false);
-    });
-  }
-
-  useEffect(() => {
-    if (user) loadAddresses();
-  }, [user]);
-
   async function handleAdd(e: React.FormEvent) {
     e.preventDefault();
     setSaving(true);
@@ -46,7 +39,7 @@ export default function ProfilePage() {
       setNewLabel("");
       setNewAddress("");
       setMakeDefault(false);
-      loadAddresses();
+      queryClient.invalidateQueries({ queryKey: qk.addresses() });
     } catch (err: unknown) {
       setError(err instanceof Error ? err.message : "Failed to save address");
     } finally {
@@ -56,16 +49,16 @@ export default function ProfilePage() {
 
   async function handleSetDefault(id: string) {
     await api.patch(`/api/addresses/${id}`, { makeDefault: true });
-    loadAddresses();
+    queryClient.invalidateQueries({ queryKey: qk.addresses() });
   }
 
   async function handleDelete(id: string) {
     if (!confirm("Delete this address?")) return;
     await api.delete(`/api/addresses/${id}`);
-    loadAddresses();
+    queryClient.invalidateQueries({ queryKey: qk.addresses() });
   }
 
-  if (loading || fetching) {
+  if (loading || addressesLoading) {
     return (
       <div className="flex min-h-screen items-center justify-center">
         <div className="h-8 w-8 animate-spin rounded-full border-4 border-[var(--accent-9)] border-t-transparent" />
