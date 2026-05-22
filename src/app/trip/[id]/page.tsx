@@ -10,6 +10,7 @@ import { collection, query, where, onSnapshot } from "firebase/firestore";
 import { useAuth } from "@/hooks/useAuth";
 import { useTripDetail, useTripMembers, useTravelTime, useSavedAddresses } from "@/hooks/queries";
 import { qk } from "@/lib/queryClient";
+import { api } from "@/lib/apiClient";
 import { db } from "@/lib/firebase";
 import type { FlightWithPassengers } from "@/types";
 import { GuestRoster } from "@/components/GuestRoster";
@@ -26,6 +27,7 @@ export default function TripPage() {
   const queryClient = useQueryClient();
 
   const [showInvite, setShowInvite] = useState(false);
+  const [polling, setPolling] = useState(false);
   const [originOverride, setOriginOverride] = useState<{
     lat: number; lng: number; address: string;
   } | null>(null);
@@ -74,6 +76,18 @@ export default function TripPage() {
     queryClient.invalidateQueries({ queryKey: qk.traveltime(tripId, originOverride) });
   }
 
+  async function handleRefresh() {
+    setPolling(true);
+    try {
+      // Force a fresh AeroAPI poll for this trip's flights, then refetch
+      // travel times so leaveBy reflects the latest delays and traffic.
+      await api.post(`/api/trips/${tripId}/poll`, {});
+    } finally {
+      setPolling(false);
+    }
+    refetchTravelTime();
+  }
+
   if (loading || tripLoading) {
     return (
       <div className="flex min-h-screen items-center justify-center">
@@ -119,8 +133,8 @@ export default function TripPage() {
           trip={trip}
           savedAddresses={savedAddresses}
           onOriginChange={handleOriginChange}
-          onRefresh={() => refetchTravelTime()}
-          refreshing={travelTimeFetching}
+          onRefresh={handleRefresh}
+          refreshing={polling || travelTimeFetching}
         />
       )}
 
