@@ -38,7 +38,7 @@ export async function POST(req: NextRequest) {
 
   try {
     const now = new Date();
-    const windowStart = new Date(now.getTime() - 60 * 60 * 1000); // 1h ago
+    const windowStart = new Date(now.getTime() - 4 * 60 * 60 * 1000); // 4h ago
     const windowEnd = new Date(now.getTime() + 24 * 60 * 60 * 1000); // 24h ahead
 
     // Only poll flights in the active window; skip arrived/cancelled
