@@ -58,6 +58,11 @@ export async function fetchFlightStatus(
     next: { revalidate: 0 },
   });
 
+  // 404 means AeroAPI doesn't have this flight yet (e.g. far-future schedule,
+  // codeshare not yet loaded, or flight doesn't exist). Treat it as "no data"
+  // so the caller can still create the flight as "pending" and let the cron
+  // fill it in later — rather than blocking the add entirely.
+  if (res.status === 404) return null;
   if (!res.ok) throw new Error(`AeroAPI error: ${res.status}`);
 
   const data = await res.json();
