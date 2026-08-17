@@ -34,7 +34,15 @@ export async function checkRateLimit(
   const limiter = await getRatelimiter(requests, windowSeconds);
   if (!limiter) return null; // dev mode — skip
 
-  const { success } = await limiter.limit(key);
+  // Fail open: if Redis is unreachable (e.g. archived/paused Upstash DB), losing
+  // rate limiting is better than 500ing every route that calls this.
+  let success: boolean;
+  try {
+    ({ success } = await limiter.limit(key));
+  } catch (err) {
+    console.error(`Rate limit check failed for ${key}; allowing request`, err);
+    return null;
+  }
   if (!success) {
     return NextResponse.json({ error: "Too many requests" }, { status: 429 });
   }
